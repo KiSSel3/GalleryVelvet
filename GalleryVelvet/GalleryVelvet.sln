@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalleryVelvet.Domain", "Gal
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalleryVelvet.DAL", "GalleryVelvet.DAL\GalleryVelvet.DAL.csproj", "{C4EC4CB6-2492-4E6C-91E7-CA9F6C089B45}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalleryVelvet.BLL", "GalleryVelvet.BLL\GalleryVelvet.BLL.csproj", "{8ADFDF58-9CD8-40DF-AC75-11287087418F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GalleryVelvet.Presentation", "GalleryVelvet.Presentation\GalleryVelvet.Presentation.csproj", "{0E916584-7345-408C-AB26-2BDCF7E0051C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,13 @@ Global
 		{C4EC4CB6-2492-4E6C-91E7-CA9F6C089B45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4EC4CB6-2492-4E6C-91E7-CA9F6C089B45}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4EC4CB6-2492-4E6C-91E7-CA9F6C089B45}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8ADFDF58-9CD8-40DF-AC75-11287087418F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8ADFDF58-9CD8-40DF-AC75-11287087418F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8ADFDF58-9CD8-40DF-AC75-11287087418F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8ADFDF58-9CD8-40DF-AC75-11287087418F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E916584-7345-408C-AB26-2BDCF7E0051C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E916584-7345-408C-AB26-2BDCF7E0051C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E916584-7345-408C-AB26-2BDCF7E0051C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E916584-7345-408C-AB26-2BDCF7E0051C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
