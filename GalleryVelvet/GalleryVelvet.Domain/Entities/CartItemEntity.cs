@@ -14,4 +14,7 @@ public sealed class CartItemEntity : BaseEntity
     
     public Guid SizeId { get; set; }
     public SizeEntity Size { get; set; } = null!;
+    
+    public ICollection<CartItemEntity> CartItems { get; set; } = [];
+    public ICollection<OrderItemEntity> OrderItems { get; set; } = [];
 }

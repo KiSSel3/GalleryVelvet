@@ -1,4 +1,5 @@
 using GalleryVelvet.Domain.Common;
+using GalleryVelvet.Domain.M2M;
 
 namespace GalleryVelvet.Domain.Entities;
 
@@ -18,4 +19,8 @@ public sealed class ProductEntity : BaseEntity
     public ICollection<ImageEntity> Images { get; set; } = [];
     public ICollection<TagEntity> Tags { get; set; } = [];
     public ICollection<SizeEntity> Sizes { get; set; } = [];
+    public ICollection<CartItemEntity> CartItems { get; set; } = [];
+    public ICollection<OrderItemEntity> OrderItems { get; set; } = [];
+    public ICollection<ProductTagEntity> ProductTags { get; set; }
+    public ICollection<ProductSizeEntity> ProductSizes { get; set; } = [];
 }

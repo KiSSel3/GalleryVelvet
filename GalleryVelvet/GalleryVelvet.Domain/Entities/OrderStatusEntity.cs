@@ -5,4 +5,6 @@ namespace GalleryVelvet.Domain.Entities;
 public sealed class OrderStatusEntity : BaseEntity
 {
     public required string Name { get; set; }
+
+    public ICollection<OrderEntity> Orders { get; set; } = [];
 }
