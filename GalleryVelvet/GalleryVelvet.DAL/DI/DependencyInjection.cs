@@ -1,6 +1,8 @@
 using GalleryVelvet.DAL.Infrastructure;
 using GalleryVelvet.DAL.Infrastructure.Seeders.Implementations;
 using GalleryVelvet.DAL.Infrastructure.Seeders.Interfaces;
+using GalleryVelvet.DAL.Repositories.Implementations;
+using GalleryVelvet.DAL.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,9 +34,15 @@ public static class DependencyInjection
     
     private static IServiceCollection AddRepositories(this IServiceCollection services)
     {
-        // Примеры регистрации репозиториев:
-        // services.AddScoped<IProductRepository, ProductRepository>();
-        // services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ICartItemRepository, CartItemRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IOrderStatusRepository, OrderStatusRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<ISizeRepository, SizeRepository>();
+        services.AddScoped<ITagRepository, TagRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
 
         return services;
     }
