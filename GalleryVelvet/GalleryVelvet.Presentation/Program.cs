@@ -1,11 +1,25 @@
+using GalleryVelvet.BLL.DI;
 using GalleryVelvet.DAL.DI;
 using GalleryVelvet.DAL.Infrastructure;
 using GalleryVelvet.DAL.Infrastructure.Seeders.Interfaces;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddDataAccessLayerServices(builder.Configuration);
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "Authentication";
+        options.LoginPath = "/Account/Authorization";
+        options.Cookie.HttpOnly = true;
+        options.SlidingExpiration = true;
+    });
+
+builder.Services
+    .AddDataAccessLayerServices(builder.Configuration)
+    .AddBusinessLogicLayerServices(builder.Configuration);
 
 var app = builder.Build();
 

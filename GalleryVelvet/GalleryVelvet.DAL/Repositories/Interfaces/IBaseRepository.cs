@@ -12,18 +12,19 @@ public interface IBaseRepository<TEntity> where TEntity : BaseEntity
     Task SoftDeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
     
     Task HardDeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
-    
-    Task<TEntity?> GetByIdAsync(Guid id,
-        CancellationToken cancellationToken = default,
-        params Expression<Func<TEntity, object>>[] includeProperties);
+
+    Task<TEntity?> GetByIdAsync(
+        Guid id,
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeBuilder = null,
+        CancellationToken cancellationToken = default);
 
     Task<TEntity?> GetFirstOrDefaultAsync(
         Expression<Func<TEntity, bool>> filter,
-        CancellationToken cancellationToken = default,
-        params Expression<Func<TEntity, object>>[] includeProperties);
-    
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeBuilder = null,
+        CancellationToken cancellationToken = default);
+
     IQueryable<TEntity> GetQueryable(
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        params Expression<Func<TEntity, object>>[] includeProperties);
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeBuilder = null);
 }

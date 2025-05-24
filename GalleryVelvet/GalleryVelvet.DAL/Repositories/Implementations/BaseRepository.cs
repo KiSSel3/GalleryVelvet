@@ -41,40 +41,40 @@ public class BaseRepository<TEntity>(AppDbContext dbContext) : IBaseRepository<T
         return dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    public virtual Task<TEntity?> GetByIdAsync(
+    public Task<TEntity?> GetByIdAsync(
         Guid id,
-        CancellationToken cancellationToken = default,
-        params Expression<Func<TEntity, object>>[] includeProperties)
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeBuilder = null,
+        CancellationToken cancellationToken = default)
     {
         var query = _dbSet.Where(e => e.Id == id);
 
-        foreach (var includeProperty in includeProperties)
+        if (includeBuilder is not null)
         {
-            query = query.Include(includeProperty);
+            query = includeBuilder(query);
         }
 
         return query.FirstOrDefaultAsync(cancellationToken);
     }
-
-    public virtual Task<TEntity?> GetFirstOrDefaultAsync(
+    
+    public Task<TEntity?> GetFirstOrDefaultAsync(
         Expression<Func<TEntity, bool>> filter,
-        CancellationToken cancellationToken = default,
-        params Expression<Func<TEntity, object>>[] includeProperties)
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeBuilder = null,
+        CancellationToken cancellationToken = default)
     {
         var query = _dbSet.Where(filter);
 
-        foreach (var include in includeProperties)
+        if (includeBuilder is not null)
         {
-            query = query.Include(include);
+            query = includeBuilder(query);
         }
 
         return query.FirstOrDefaultAsync(cancellationToken);
     }
 
-    public virtual IQueryable<TEntity> GetQueryable(
+    public IQueryable<TEntity> GetQueryable(
         Expression<Func<TEntity, bool>>? filter = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-        params Expression<Func<TEntity, object>>[] includeProperties)
+        Func<IQueryable<TEntity>, IQueryable<TEntity>>? includeBuilder = null)
     {
         var query = _dbSet.AsNoTracking();
 
@@ -83,9 +83,9 @@ public class BaseRepository<TEntity>(AppDbContext dbContext) : IBaseRepository<T
             query = query.Where(filter);
         }
 
-        foreach (var includeProperty in includeProperties)
+        if (includeBuilder is not null)
         {
-            query = query.Include(includeProperty);
+            query = includeBuilder(query);
         }
 
         if (orderBy is not null)

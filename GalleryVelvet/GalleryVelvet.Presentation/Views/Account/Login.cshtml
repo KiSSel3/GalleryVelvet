@@ -1,0 +1,238 @@
+@model GalleryVelvet.Presentation.Models.Account.LoginViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Вход - GalleryVelvet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        .login-form-wrapper {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .auth-container {
+            display: flex;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            max-width: 900px;
+            width: 90%;
+        }
+
+        .auth-image-section {
+            flex: 0.8;
+            background: linear-gradient(to right, #007bff, #0056b3);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+        }
+        .auth-image-section p {
+            font-size: 1.8em;
+            font-weight: 500;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .logo-container img {
+            max-width: 150px;
+            margin-bottom: 10px;
+        }
+
+        .logo-container h2 {
+            font-size: 2em;
+            color: #007bff;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .form-title {
+            font-size: 1.8em;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+            font-size: 0.9em;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 0.95em;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        .btn-submit {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+
+        .text-danger {
+            color: #dc3545;
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        .field-error-message {
+            display: block;
+        }
+
+        .general-error-message {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .general-error-message ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sub-link-container {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .sub-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .sub-link:hover {
+            text-decoration: underline;
+        }
+        
+        @@media (max-width: 900px) {
+            .auth-container {
+                flex-direction: column;
+                width: 90%;
+                max-width: 450px;
+            }
+            
+            .auth-image-section {
+                display: none;
+            }
+            
+            .login-form-wrapper {
+                padding: 30px;
+                border-radius: 12px;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .login-form-wrapper {
+                padding: 20px;
+            }
+            
+            .form-title {
+                font-size: 1.5em;
+            }
+            
+            .logo-container h2 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="auth-container">
+    <div class="login-form-wrapper">
+        <div class="logo-container">
+            <h2>GalleryVelvet</h2>
+        </div>
+        <h3 class="form-title">Вход в аккаунт</h3>
+
+        <form asp-action="Login" method="post" novalidate>
+            <div class="form-group">
+                <label asp-for="Login" class="form-label">Логин</label>
+                <input asp-for="Login" class="form-control" placeholder="Введите ваш логин" />
+                <span asp-validation-for="Login" class="text-danger field-error-message"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password" class="form-label">Пароль</label>
+                <input asp-for="Password" type="password" class="form-control" placeholder="••••••••" />
+                <span asp-validation-for="Password" class="text-danger field-error-message"></span>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-submit">Войти</button>
+            </div>
+        </form>
+
+        <div class="sub-link-container">
+            <p>Нет аккаунта? <a href="/Account/Register" class="sub-link">Зарегистрируйтесь</a></p>
+        </div>
+    </div>
+    <div class="auth-image-section">
+        <p>С возвращением в GalleryVelvet!</p>
+    </div>
+</div>
+</body>
+</html>

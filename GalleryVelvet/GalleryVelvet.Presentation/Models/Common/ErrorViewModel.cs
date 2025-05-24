@@ -1,4 +1,4 @@
-namespace GalleryVelvet.Presentation.Models;
+namespace GalleryVelvet.Presentation.Models.Common;
 
 public class ErrorViewModel
 {

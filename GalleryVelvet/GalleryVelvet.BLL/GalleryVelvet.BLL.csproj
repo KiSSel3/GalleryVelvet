@@ -10,4 +10,8 @@
       <ProjectReference Include="..\GalleryVelvet.DAL\GalleryVelvet.DAL.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Mapster" Version="7.4.2-pre02" />
+    </ItemGroup>
+
 </Project>
