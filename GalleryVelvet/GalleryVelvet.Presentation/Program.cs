@@ -12,7 +12,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.Cookie.Name = "Authentication";
-        options.LoginPath = "/Account/Authorization";
+        options.LoginPath = "/Account/Login";
         options.Cookie.HttpOnly = true;
         options.SlidingExpiration = true;
     });
@@ -23,7 +23,7 @@ builder.Services
 
 var app = builder.Build();
 
-/*using (var scope = app.Services.CreateScope())
+using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var seeders = scope.ServiceProvider.GetServices<ISeeder>();
@@ -32,7 +32,7 @@ var app = builder.Build();
     {
         await seeder.SeedAsync(context);
     }
-}*/
+}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
