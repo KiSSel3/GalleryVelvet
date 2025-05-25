@@ -1,49 +1,609 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>@ViewData["Title"] - GalleryVelvet.Presentation</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="~/GalleryVelvet.Presentation.styles.css" asp-append-version="true"/>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - GalleryVelvet</title>
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        :root {
+            --sidebar-width-expanded: 280px;
+            --sidebar-width-collapsed: 0px;
+            --header-height: 70px;
+            
+            --background-color-body: #F4F6F8;
+            --background-color-surface: #FFFFFF;
+            --text-color-primary: #212529;
+            --text-color-secondary: #6C757D;
+            --accent-color: #007BFF;
+            --accent-color-text: #FFFFFF;
+            --border-color: #DEE2E6;
+            --hover-background-color: #E9ECEF;
+            --sales-color: #FF0000;
+        }
+
+        body {
+            font-family: 'Montserrat', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color-body);
+            color: var(--text-color-primary);
+            overflow-x: hidden;
+        }
+
+        .page-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-left: var(--sidebar-width-collapsed);
+            transition: padding-left 0.3s ease-in-out;
+            box-sizing: border-box;
+        }
+
+        .page-wrapper.sidebar-expanded {
+            padding-left: var(--sidebar-width-expanded);
+        }
+
+        .sidebar {
+            width: var(--sidebar-width-expanded);
+            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: var(--background-color-surface);
+            border-right: 1px solid var(--border-color);
+            box-sizing: border-box;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        .sidebar.expanded {
+            transform: translateX(0);
+        }
+
+        .sidebar-top-content {
+            padding: 20px 20px 0 20px;
+            overflow-y: auto;
+            flex-shrink: 1;
+        }
+
+        .sidebar-header {
+            padding: 10px 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li a {
+            display: block;
+            padding: 12px 15px;
+            color: var(--text-color-primary);
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 400;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-nav li a:hover {
+            background-color: var(--hover-background-color);
+            color: var(--accent-color);
+        }
+        .sidebar-nav li a.active {
+            background-color: var(--accent-color);
+            color: var(--accent-color-text);
+        }
+
+        .sidebar-bottom-content-group {
+            margin-top: auto;
+            padding: 0 0 20px 0;
+            flex-shrink: 0;
+        }
+
+        .sidebar-separator {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 20px 20px 20px 20px;
+        }
+
+        .sidebar-additional-nav ul {
+            list-style: none;
+            padding: 0 20px;
+            margin: 0 0 20px 0;
+        }
+
+        .sidebar-additional-nav li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-additional-nav li a.accordion-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            color: var(--text-color-primary);
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: 400;
+            width: 100%;
+            transition: color 0.2s ease;
+        }
+        .sidebar-additional-nav li a.accordion-toggle:hover {
+            color: var(--accent-color);
+        }
+
+        .sidebar-additional-nav li a.accordion-toggle i.fa-chevron-down {
+            transition: transform 0.3s ease;
+            font-size: 0.8em;
+        }
+        .sidebar-additional-nav li a.accordion-toggle.open i.fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            display: none;
+            padding-left: 15px;
+            margin-top: 5px;
+        }
+        .accordion-content.open {
+            display: block;
+        }
+        .accordion-content li a {
+            display: block;
+            padding: 8px 0;
+            font-size: 0.95em;
+            color: var(--text-color-secondary);
+            text-decoration: none;
+        }
+        .accordion-content li a:hover {
+            color: var(--accent-color);
+        }
+
+        .sidebar-bottom-links {
+            padding: 0 20px;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-bottom-links a {
+            color: var(--text-color-primary);
+            text-decoration: none;
+            font-size: 0.95em;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s ease;
+        }
+        .sidebar-bottom-links a:hover {
+            color: var(--accent-color);
+        }
+        .sidebar-bottom-links i {
+            margin-right: 10px;
+            font-size: 1.1em;
+            width: 20px;
+            text-align: center;
+        }
+
+        .language-currency-selector {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        .language-currency-selector span,
+        .language-currency-selector select {
+            background-color: transparent;
+            color: var(--text-color-primary);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        .language-currency-selector span i,
+        .language-currency-selector select i {
+            margin-left: 8px;
+        }
+        .language-currency-selector span:hover,
+        .language-currency-selector select:hover {
+            border-color: var(--accent-color);
+        }
+        .language-currency-selector select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .site-header {
+            height: var(--header-height);
+            background-color: var(--background-color-surface);
+            color: var(--text-color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 25px;
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid var(--border-color);
+            transition: left 0.3s ease-in-out, right 0.3s ease-in-out;
+        }
+
+        .page-wrapper.sidebar-expanded .site-header {
+            left: var(--sidebar-width-expanded);
+        }
+
+        .header-left { display: flex; align-items: center; }
+
+        .sidebar-toggle-btn {
+            background: none; border: none;
+            color: var(--text-color-primary);
+            font-size: 1.8em; cursor: pointer;
+            padding: 0 15px 0 0; margin-right: 10px;
+            position: relative;
+            left: 0;
+            transition: left 0.3s ease-in-out;
+        }
+        .sidebar-toggle-btn:hover { color: var(--accent-color); }
+        
+        .page-wrapper.sidebar-expanded .sidebar-toggle-btn {
+            left: calc(-1 * var(--sidebar-width-expanded));
+        }
+
+        .header-nav-links {
+            color: var(--text-color-secondary);
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 500;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            position: relative;
+            left: 0;
+            transition: left 0.3s ease-in-out;
+        }
+
+        .page-wrapper.sidebar-expanded .header-nav-links {
+            left: calc(-1 * var(--sidebar-width-expanded));
+        }
+
+        .header-nav-links a {
+            color: var(--text-color-secondary);
+            text-decoration: none;
+            margin-right: 20px;
+        }
+        .header-nav-links a.active-megamenu {
+            color: var(--accent-color);
+        }
+        .header-nav-links a:hover { color: var(--accent-color); }
+
+
+        .header-logo {
+            font-size: 1.8em; font-weight: 700;
+            color: var(--accent-color);
+            text-decoration: none; letter-spacing: 2px;
+            position: absolute; left: 50%; transform: translateX(-50%);
+        }
+
+        .header-right-icons a {
+            color: var(--text-color-primary); margin-left: 20px;
+            font-size: 1.2em; text-decoration: none;
+        }
+        .header-right-icons a:hover { color: var(--accent-color); }
+        
+        .top-megamenu-panel {
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            width: 100%;
+            background-color: var(--background-color-surface);
+            z-index: 990;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            padding: 30px 40px;
+            box-sizing: border-box;
+            display: none;
+            opacity: 0;
+            transform: translateY(-15px);
+            transition: opacity 0.25s ease-out, transform 0.25s ease-out, visibility 0.25s linear, left 0.3s ease-in-out, width 0.3s ease-in-out;
+            visibility: hidden;
+        }
+        
+        .page-wrapper.sidebar-expanded .top-megamenu-panel.megamenu-visible {
+            left: var(--sidebar-width-expanded);
+            width: calc(100% - var(--sidebar-width-expanded));
+        }
+
+        .top-megamenu-panel.megamenu-visible {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+            visibility: visible;
+        }
+
+
+        .megamenu-content-wrapper {
+            display: flex;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .megamenu-column {
+            min-width: 220px;
+            padding-right: 40px;
+            margin-bottom:20px;
+        }
+        .megamenu-column:last-of-type {
+            padding-right: 0;
+        }
+
+
+        .megamenu-column ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .megamenu-column ul li a {
+            display: block;
+            padding: 6px 0;
+            color: var(--text-color-primary);
+            text-decoration: none;
+            font-size: 0.9em;
+            font-weight: 400;
+        }
+
+        .megamenu-column ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        .megamenu-column ul li a .count {
+            color: var(--text-color-primary);
+            font-size: 0.9em;
+            margin-left: 8px;
+            opacity: 0.7;
+        }
+
+        .megamenu-bottom-links {
+            width: 100%;
+            margin-top: 15px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .megamenu-bottom-links a {
+            color: var(--text-color-primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95em;
+            margin-right: 40px;
+        }
+        .megamenu-bottom-links a.all-products-link:hover,
+        .megamenu-bottom-links a.sales-link:hover {
+            color: var(--accent-color);
+        }
+
+        .megamenu-bottom-links a.sales-link {
+            color: var(--sales-color);
+            text-transform: uppercase;
+        }
+        
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            box-sizing: border-box;
+            margin-top: var(--header-height);
+            width: 100%;
+        }
+        
+        .site-footer {
+            background-color: var(--background-color-surface);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-color-secondary);
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+            width: calc(100% - var(--sidebar-width-collapsed));
+            transition: width 0.3s ease-in-out, margin-left 0.3s ease-in-out;
+            margin-left: var(--sidebar-width-collapsed);
+        }
+
+        .page-wrapper.sidebar-expanded .site-footer {
+            width: calc(100% - var(--sidebar-width-expanded));
+            margin-left: var(--sidebar-width-expanded);
+        }
+        
+        @@media (max-width: 768px) {
+            :root {
+                --sidebar-width-expanded: 250px;
+            }
+            .header-logo { font-size: 1.5em; }
+            .header-nav-links { display: none; }
+
+            .top-megamenu-panel {
+                display: none !important;
+            }
+
+            .language-currency-selector { flex-direction: column; align-items: stretch; }
+            .language-currency-selector span, .language-currency-selector select { margin-bottom: 10px; margin-right: 0; }
+            .language-currency-selector span:last-child, .language-currency-selector select:last-child { margin-bottom: 0; }
+        }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">GalleryVelvet.Presentation</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+<div class="page-wrapper" id="pageWrapper">
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-top-content">
+            <div class="sidebar-header">
+            </div>
+            <nav class="sidebar-nav">
+                @await Component.InvokeAsync("TagSidebar")
+            </nav>
+        </div>
+
+        <div class="sidebar-bottom-content-group">
+            <hr class="sidebar-separator">
+            <nav class="sidebar-additional-nav">
+                <ul>
+                    <li>
+                        <a href="#" class="accordion-toggle">Покупателям <i class="fas fa-chevron-down"></i></a>
+                        <ul class="accordion-content">
+                            <li><a href="#">Доставка и оплата</a></li>
+                            <li><a href="#">Возврат</a></li>
+                            <li><a href="#">Размерная сетка</a></li>
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                    <li>
+                        <a href="#" class="accordion-toggle">Для бизнеса <i class="fas fa-chevron-down"></i></a>
+                        <ul class="accordion-content">
+                            <li><a href="#">Оптовые продажи</a></li>
+                            <li><a href="#">Сотрудничество</a></li>
+                        </ul>
                     </li>
                 </ul>
+            </nav>
+            <div class="sidebar-bottom-links">
+                <a href="#" title="Instagram"><i class="fab fa-instagram"></i> Instagram</a>
+                <a href="#" title="Telegram"><i class="fab fa-telegram-plane"></i> Telegram</a>
+            </div>
+            <div class="language-currency-selector">
+                <span>Русский <i class="fas fa-chevron-down"></i></span>
+                <span>BYN <i class="fas fa-chevron-down"></i></span>
             </div>
         </div>
-    </nav>
-</header>
-<div class="container">
-    <main role="main" class="pb-3">
+    </aside>
+
+    <div class="top-megamenu-panel" id="womanMegaMenu">
+        <div class="megamenu-content-wrapper">
+            @await Component.InvokeAsync("CategorySidebar")
+        </div>
+        <div class="megamenu-content-wrapper"> <div class="megamenu-bottom-links">
+                <a asp-controller="Product"
+                   asp-action="Index"
+                   class="all-products-link">
+                    ВСЕ ТОВАРЫ
+                </a>
+                <a asp-controller="Product"
+                   asp-action="Index"
+                   asp-route-onlyDiscounted="true"
+                   class="sales-link">
+                    SALES WEEK
+                </a>
+            </div>
+        </div>
+    </div>
+    <header class="site-header">
+        <div class="header-left">
+            <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Toggle Menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="header-nav-links">
+                <a href="#" id="womanMenuToggle">WOMAN</a>
+            </div>
+        </div>
+        <a href="/" class="header-logo">GalleryVelvet</a>
+        <div class="header-right-icons">
+            <a asp-controller="Cart"
+               asp-action="GetCartByUserId"
+               aria-label="Cart">
+                <i class="fas fa-shopping-bag"></i>
+            </a>
+        </div>
+    </header>
+
+    <main class="main-content">
         @RenderBody()
     </main>
 </div>
 
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2025 - GalleryVelvet.Presentation - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-    </div>
-</footer>
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+        const pageWrapper = document.getElementById('pageWrapper');
+
+        if (sidebar && sidebarToggleBtn && pageWrapper) {
+            sidebarToggleBtn.addEventListener('click', function () {
+                sidebar.classList.toggle('expanded');
+                pageWrapper.classList.toggle('sidebar-expanded');
+                
+                if (sidebar.classList.contains('expanded')) {
+                    localStorage.setItem('sidebarState_znwr', 'expanded');
+                } else {
+                    localStorage.setItem('sidebarState_znwr', 'collapsed');
+                }
+            });
+            
+            const currentSidebarState = localStorage.getItem('sidebarState_znwr');
+            if (currentSidebarState === 'expanded') {
+                sidebar.classList.add('expanded');
+                pageWrapper.classList.add('sidebar-expanded');
+            }
+        }
+
+        const accordionToggles = document.querySelectorAll('.sidebar .accordion-toggle');
+        accordionToggles.forEach(toggle => {
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                const content = this.nextElementSibling;
+                const icon = this.querySelector('i.fa-chevron-down');
+
+                if (content && content.classList.contains('accordion-content')) {
+                    content.classList.toggle('open');
+                    this.classList.toggle('open');
+                }
+            });
+        });
+        
+        const womanMenuToggle = document.getElementById('womanMenuToggle');
+        const womanMegaMenu = document.getElementById('womanMegaMenu');
+
+        if (womanMenuToggle && womanMegaMenu) {
+            womanMenuToggle.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const isVisible = womanMegaMenu.classList.contains('megamenu-visible');
+                
+                womanMegaMenu.classList.toggle('megamenu-visible');
+                this.classList.toggle('active-megamenu', !isVisible);
+            });
+            
+            document.addEventListener('click', function (e) {
+                if (womanMegaMenu.classList.contains('megamenu-visible') &&
+                    !womanMegaMenu.contains(e.target) &&
+                    !womanMenuToggle.contains(e.target)) {
+                    womanMegaMenu.classList.remove('megamenu-visible');
+                    womanMenuToggle.classList.remove('active-megamenu');
+                }
+            });
+        }
+    });
+</script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,0 +1,545 @@
+@model System.Collections.Generic.IEnumerable<GalleryVelvet.Domain.Entities.CartItemEntity>
+
+@{
+    var totalPrice = Model.Sum(item => (item.Product.DiscountPrice ?? item.Product.Price) * item.Quantity);
+    Layout = "_Layout";
+}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .main-content {
+        padding: 40px 0;
+        min-height: calc(100vh - 100px);
+    }
+
+    .checkout-container {
+        max-width: 1521px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .checkout-title {
+        font-size: 24px;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 60px;
+        color: #000;
+    }
+
+    .checkout-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 80px;
+        align-items: start;
+    }
+
+    .checkout-forms {
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .form-section {
+        background: #fff;
+        padding: 30px;
+        border: 1px solid #e5e5e5;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        cursor: pointer;
+    }
+
+    .section-number {
+        width: 30px;
+        height: 30px;
+        border: 2px solid #000;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 400;
+        margin-right: 15px;
+        flex-shrink: 0;
+    }
+
+    .section-number.completed {
+        background: #000;
+        color: #fff;
+    }
+
+    .section-title {
+        font-size: 16px;
+        font-weight: 400;
+        flex: 1;
+    }
+
+    .section-toggle {
+        font-size: 18px;
+        color: #666;
+        transition: transform 0.3s ease;
+    }
+
+    .section-toggle.open {
+        transform: rotate(180deg);
+    }
+
+    .section-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+
+    .section-content.open {
+        max-height: 500px;
+    }
+
+    .section-content.active {
+        max-height: none;
+        overflow: visible;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e5e5e5;
+        background: #fff;
+        font-size: 14px;
+        font-family: inherit;
+        color: #000;
+        transition: border-color 0.3s ease;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #000;
+    }
+
+    .form-input::placeholder {
+        color: #999;
+    }
+
+    .form-select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e5e5e5;
+        background: #fff;
+        font-size: 14px;
+        font-family: inherit;
+        color: #000;
+        cursor: pointer;
+    }
+
+    .form-textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #e5e5e5;
+        background: #fff;
+        font-size: 14px;
+        font-family: inherit;
+        color: #000;
+        resize: vertical;
+        min-height: 100px;
+    }
+    
+    .phone-input-group {
+        display: flex;
+        gap: 10px;
+    }
+
+    .phone-prefix {
+        width: 100px;
+        flex-shrink: 0;
+    }
+
+    .phone-number {
+        flex: 1;
+    }
+    
+    .order-summary {
+        background: #fff;
+        padding: 30px;
+        border: 1px solid #e5e5e5;
+        position: sticky;
+        top: 120px;
+    }
+
+    .cart-item {
+        display: flex;
+        gap: 20px;
+        padding: 20px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .cart-item:last-child {
+        border-bottom: none;
+    }
+
+    .item-image {
+        width: 80px;
+        height: 100px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .item-details {
+        flex: 1;
+    }
+
+    .item-name {
+        font-size: 14px;
+        font-weight: 400;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+
+    .item-options {
+        font-size: 12px;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .item-quantity {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .quantity-btn {
+        width: 30px;
+        height: 30px;
+        border: 1px solid #e5e5e5;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s ease;
+    }
+
+    .quantity-btn:hover {
+        border-color: #000;
+    }
+
+    .quantity-value {
+        font-size: 14px;
+        font-weight: 400;
+    }
+
+    .item-price {
+        font-size: 14px;
+        font-weight: 400;
+        text-align: right;
+    }
+
+    .remove-item {
+        background: none;
+        border: none;
+        color: #ccc;
+        cursor: pointer;
+        font-size: 18px;
+        padding: 5px;
+        transition: color 0.3s ease;
+    }
+
+    .remove-item:hover {
+        color: #999;
+    }
+    
+    .delivery-options {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    .delivery-option {
+        padding: 15px;
+        border: 2px solid #e5e5e5;
+        background: #fff;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .delivery-option.active {
+        border-color: #000;
+        background: #000;
+        color: #fff;
+    }
+
+    .delivery-option:hover {
+        border-color: #666;
+    }
+    
+
+    @@media (max-width: 1024px) {
+    .checkout-layout {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .order-summary {
+        position: static;
+        order: -1;
+    }
+    }
+
+    @@media (max-width: 768px) {
+    .form-section {
+        padding: 20px;
+    }
+
+    .order-summary {
+        padding: 20px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .delivery-options {
+        grid-template-columns: 1fr;
+    }
+
+    .checkout-container {
+        padding: 0 15px;
+    }
+    }
+</style>
+
+<main class="main-content">
+    <div class="checkout-container">
+        <h1 class="checkout-title">ОФОРМЛЕНИЕ ЗАКАЗА</h1>
+
+        <div class="checkout-layout">
+            <div class="checkout-forms">
+                <div class="form-section">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <div class="section-number">5</div>
+                        <div class="section-title">Тип доставки</div>
+                        <div class="section-toggle">−</div>
+                    </div>
+                    <div class="section-content active">
+                        <div class="delivery-options">
+                            <div class="delivery-option active" onclick="selectDelivery(this, 'delivery')">
+                                ДОСТАВКА
+                            </div>
+                            <div class="delivery-option" onclick="selectDelivery(this, 'pickup')">
+                                САМОВЫВОЗ
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <div class="section-header" onclick="toggleSection(this)">
+                        <div class="section-number">6</div>
+                        <div class="section-title">Детали заказа</div>
+                        <div class="section-toggle">−</div>
+                    </div>
+                    <div class="section-content active">
+                        <div class="form-group">
+                            <div class="form-row">
+                                <input type="text" class="form-input" placeholder="Имя красивого человека *" required>
+                                <input type="text" class="form-input" placeholder="Фамилия красивого человека *" required>
+                            </div>
+                        </div>
+                            
+                        <div class="form-group">
+                            <div class="phone-input-group">
+                                <select class="form-select phone-prefix">
+                                    <option value="+375">+375</option>
+                                </select>
+                                <input type="tel" class="form-input phone-number" placeholder="Телефон *" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="email" class="form-input" placeholder="Email *" required>
+                        </div>
+
+                        <div class="form-group">
+                            <textarea class="form-textarea" placeholder="Комментарии"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-summary">
+                <div style="margin-bottom: 30px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                        <div class="section-number">4</div>
+                        <div class="section-title" style="margin-left: 15px;">Состав заказа</div>
+                    </div>
+
+                    @foreach (var item in Model)
+                    {
+                        var product = item.Product;
+                        var image = product.Images.FirstOrDefault()?.Image ?? "";
+                        var format = product.Images.FirstOrDefault()?.Format ?? "jpeg";
+                        
+                        var base64Src = string.IsNullOrWhiteSpace(image)
+                            ? "/images/no-image_0.jpg"
+                            : $"data:image/{format};base64,{image}";
+                        
+                        var price = product.DiscountPrice ?? product.Price;
+
+                        <div class="cart-item">
+                            <img src="@base64Src" alt="@product.Name" class="item-image"/>
+
+                            <div class="item-details">
+                                <button class="remove-item" onclick="removeCartItem('@item.Id')">×</button>
+
+                                <div class="item-name">@product.Name</div>
+                                <div class="item-options">
+                                    Цвет: @product.Category.Name<br />
+                                    Размер: @item.Size.Label<br />
+                                    В наличии: много
+                                </div>
+
+                                <div class="item-quantity">
+                                    <button class="quantity-btn"
+                                            onclick="changeQuantity('@item.ProductId', '@item.SizeId', @item.Quantity, -1)">−</button>
+
+                                    <span class="quantity-value">@item.Quantity</span>
+
+                                    <button class="quantity-btn"
+                                            onclick="changeQuantity('@item.ProductId', '@item.SizeId', @item.Quantity, 1)">+</button>
+
+                                    <div class="item-price">@price.ToString("N0") BYN x @item.Quantity</div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div style="border-top: 2px solid #000; padding-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: 400;">
+                        <span>ИТОГО:</span>
+                        <span id="orderTotal">
+                            @totalPrice.ToString("N0") BYN
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    function changeQuantity(productId, sizeId, currentQuantity, delta) {
+        const newQuantity = currentQuantity + delta;
+        if (newQuantity < 1) return;
+
+        window.location.href = `/Cart/AddToCart?productId=${productId}&sizeId=${sizeId}&quantity=${delta}`;
+    }
+    
+    function toggleSection(header) {
+        const content = header.nextElementSibling;
+        const toggle = header.querySelector('.section-toggle');
+        const isOpen = content.classList.contains('active');
+
+        if (isOpen) {
+            content.classList.remove('active');
+            content.classList.add('open');
+            toggle.textContent = '+';
+            toggle.classList.remove('open');
+        } else {
+            content.classList.remove('open');
+            content.classList.add('active');
+            toggle.textContent = '−';
+            toggle.classList.add('open');
+        }
+    }
+    
+    function selectDelivery(element, type) {
+        document.querySelectorAll('.delivery-option').forEach(opt => {
+            opt.classList.remove('active');
+        });
+        element.classList.add('active');
+        console.log('Selected delivery type:', type);
+    }
+
+    function removeCartItem(cartItemId) {
+        if (confirm("Удалить этот товар из корзины?")) {
+            window.location.href = `/Cart/RemoveItem?cartItemId=${cartItemId}`;
+        }
+    }
+
+    function validateForm() {
+        const requiredFields = document.querySelectorAll('input[required], select[required]');
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.style.borderColor = '#ff4444';
+                isValid = false;
+            } else {
+                field.style.borderColor = '#e5e5e5';
+            }
+        });
+        
+        return isValid;
+    }
+    
+    document.querySelectorAll('input, select, textarea').forEach(field => {
+        field.addEventListener('input', function() {
+            if (this.hasAttribute('required') && this.value.trim()) {
+                this.style.borderColor = '#4CAF50';
+            }
+        });
+        
+        field.addEventListener('blur', function() {
+            if (this.hasAttribute('required') && !this.value.trim()) {
+                this.style.borderColor = '#ff4444';
+            } else if (this.value.trim()) {
+                this.style.borderColor = '#e5e5e5';
+            }
+        });
+    });
+    
+    document.querySelector('.phone-number').addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        
+        const prefix = document.querySelector('.phone-prefix').value;
+        
+        if (prefix === '+375') {
+            if (value.length >= 2) {
+                value = `(${value.slice(0, 2)}) ${value.slice(2, 5)}-${value.slice(5, 7)}-${value.slice(7, 9)}`;
+            }
+        }
+        
+        e.target.value = value;
+    });
+</script>

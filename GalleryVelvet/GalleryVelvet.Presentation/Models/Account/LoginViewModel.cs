@@ -9,6 +9,6 @@ public sealed class LoginViewModel
     public required string Login { get; set; }
     
     [Required(ErrorMessage = "Пароль обязателен")]
-    [StringLength(100, MinimumLength = 4, ErrorMessage = "Пароль должен содержать от 6 до 100 символов")]
+    [StringLength(100, MinimumLength = 4, ErrorMessage = "Пароль должен содержать от 4 до 100 символов")]
     public required string Password { get; set; }
 }

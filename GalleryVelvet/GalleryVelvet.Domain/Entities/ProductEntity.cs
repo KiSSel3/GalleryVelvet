@@ -17,8 +17,6 @@ public sealed class ProductEntity : BaseEntity
     public CategoryEntity Category { get; set; } = null!;
 
     public ICollection<ImageEntity> Images { get; set; } = [];
-    public ICollection<TagEntity> Tags { get; set; } = [];
-    public ICollection<SizeEntity> Sizes { get; set; } = [];
     public ICollection<CartItemEntity> CartItems { get; set; } = [];
     public ICollection<OrderItemEntity> OrderItems { get; set; } = [];
     public ICollection<ProductTagEntity> ProductTags { get; set; }

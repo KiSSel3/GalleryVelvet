@@ -1,6 +1,402 @@
-﻿@{
-    ViewData["Title"] = "Privacy Policy";
-}
-<h1>@ViewData["Title"]</h1>
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>@ViewData["Title"] - Z N W R</title>
 
-<p>Use this page to detail your site's privacy policy.</p>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    :root {
+      --sidebar-width-expanded: 280px;
+      --sidebar-width-collapsed: 0px; /* Or a small width if you want icons visible */
+      --header-height: 70px;
+      --text-color-primary: #e0e0e0;
+      --text-color-secondary: #b0b0b0;
+      --background-color-dark: #1a1a1a; /* Darker background */
+      --background-color-content: #242424; /* Slightly lighter for content or sidebar */
+      --accent-color: #ffffff; /* For logo and active elements */
+      --border-color: #333333;
+    }
+
+    body {
+      font-family: 'Montserrat', 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background-color-dark);
+      color: var(--text-color-primary);
+      overflow-x: hidden; /* Prevent horizontal scroll when sidebar is out */
+    }
+
+    .page-wrapper {
+      display: flex;
+      min-height: 100vh;
+      padding-left: var(--sidebar-width-collapsed); /* Initial padding for collapsed state */
+      transition: padding-left 0.3s ease-in-out;
+    }
+
+    .page-wrapper.sidebar-expanded {
+      padding-left: var(--sidebar-width-expanded);
+    }
+
+    /* --- Sidebar --- */
+    .sidebar {
+      width: var(--sidebar-width-expanded);
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0; /* Initially positioned on screen */
+      background-color: var(--background-color-content);
+      border-right: 1px solid var(--border-color);
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      transform: translateX(-100%); /* Initially hidden off-screen */
+      transition: transform 0.3s ease-in-out;
+      z-index: 1000;
+    }
+
+    .sidebar.expanded {
+      transform: translateX(0);
+    }
+
+    .sidebar-header {
+      padding: 10px 0;
+      margin-bottom: 30px;
+      text-align: center;
+      /* You can add a logo image here if you have one */
+    }
+
+    .sidebar-nav ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-nav li a {
+      display: block;
+      padding: 12px 15px;
+      color: var(--text-color-primary);
+      text-decoration: none;
+      font-size: 1.1em; /* Slightly larger font for main nav */
+      font-weight: 400; /* Lighter font weight */
+      transition: background-color 0.2s ease, color 0.2s ease;
+      border-radius: 4px;
+      margin-bottom: 5px; /* Space between nav items */
+    }
+
+    .sidebar-nav li a:hover,
+    .sidebar-nav li a.active {
+      background-color: rgba(255, 255, 255, 0.05); /* Subtle hover */
+      color: var(--accent-color);
+    }
+
+    .sidebar-section-title {
+      font-size: 0.9em;
+      color: var(--text-color-secondary);
+      text-transform: uppercase;
+      margin-top: 30px;
+      margin-bottom: 10px;
+      padding: 0 15px;
+      font-weight: 500;
+    }
+
+    .sidebar-bottom-links {
+      margin-top: 40px;
+      padding: 0 15px;
+    }
+
+    .sidebar-bottom-links a {
+      color: var(--text-color-secondary);
+      text-decoration: none;
+      font-size: 0.9em;
+      margin-right: 15px;
+      transition: color 0.2s ease;
+    }
+    .sidebar-bottom-links a:hover {
+      color: var(--accent-color);
+    }
+    .sidebar-bottom-links i {
+      margin-right: 5px;
+    }
+
+    .language-currency-selector {
+      margin-top: 20px;
+      padding: 0 15px;
+    }
+    .language-currency-selector select, .language-currency-selector span {
+      background-color: transparent;
+      color: var(--text-color-secondary);
+      border: 1px solid var(--border-color);
+      padding: 8px;
+      border-radius: 4px;
+      margin-right: 10px;
+      font-size: 0.9em;
+    }
+    .language-currency-selector select:focus {
+      outline: none;
+      border-color: var(--accent-color);
+    }
+
+
+    /* --- Header --- */
+    .site-header {
+      height: var(--header-height);
+      background-color: var(--background-color-dark); /* Same as body or slightly different */
+      color: var(--text-color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      box-sizing: border-box;
+      position: fixed;
+      top: 0;
+      left: 0; /* Will be offset by .page-wrapper padding-left */
+      right: 0;
+      z-index: 900; /* Below sidebar but above content */
+      border-bottom: 1px solid var(--border-color);
+      transition: left 0.3s ease-in-out;
+    }
+
+    .page-wrapper.sidebar-expanded .site-header {
+      left: var(--sidebar-width-expanded);
+    }
+
+
+    .header-left {
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar-toggle-btn {
+      background: none;
+      border: none;
+      color: var(--text-color-primary);
+      font-size: 1.8em; /* Larger icon */
+      cursor: pointer;
+      padding: 0 15px 0 0; /* Padding to the right */
+      margin-right: 10px; /* Space between button and WOMAN/MAN links */
+    }
+    .sidebar-toggle-btn:hover {
+      color: var(--accent-color);
+    }
+
+    .header-nav-links a {
+      color: var(--text-color-secondary);
+      text-decoration: none;
+      margin-right: 20px;
+      font-size: 0.9em;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+    .header-nav-links a:hover {
+      color: var(--accent-color);
+    }
+
+
+    .header-logo {
+      font-size: 1.8em; /* Prominent logo */
+      font-weight: 700; /* Bold */
+      color: var(--accent-color);
+      text-decoration: none;
+      letter-spacing: 2px; /* Spacing as in Z N W R */
+      position: absolute; /* Center the logo */
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .header-right-icons a {
+      color: var(--text-color-primary);
+      margin-left: 20px;
+      font-size: 1.2em;
+      text-decoration: none;
+    }
+    .header-right-icons a:hover {
+      color: var(--accent-color);
+    }
+
+    /* --- Main Content Area --- */
+    .main-content {
+      flex-grow: 1;
+      padding: 20px;
+      box-sizing: border-box;
+      margin-top: var(--header-height); /* To clear the fixed header */
+      width: 100%;
+    }
+
+    /* --- Footer (Minimal) --- */
+    .site-footer {
+      background-color: var(--background-color-dark);
+      border-top: 1px solid var(--border-color);
+      color: var(--text-color-secondary);
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9em;
+      margin-left: auto; /* To align with main content area */
+      margin-right: auto;
+      width: calc(100% - var(--sidebar-width-collapsed)); /* Adjust width based on sidebar */
+      transition: width 0.3s ease-in-out, margin-left 0.3s ease-in-out;
+    }
+
+    .page-wrapper.sidebar-expanded .site-footer {
+      width: calc(100% - var(--sidebar-width-expanded));
+      margin-left: var(--sidebar-width-expanded);
+    }
+
+
+    /* Accordion Styles (Basic for Покупателям/Для бизнеса if they are actual accordions) */
+    .accordion-toggle {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    .accordion-toggle i {
+      transition: transform 0.3s ease;
+    }
+    .accordion-content {
+      display: none;
+      padding-left: 15px; /* Indent sub-items */
+    }
+    .accordion-content.open {
+      display: block;
+    }
+    .accordion-toggle.open i {
+      transform: rotate(90deg); /* Or your preferred icon change */
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+    :root {
+      --sidebar-width-expanded: 250px; /* Slightly smaller sidebar on mobile */
+    }
+    .header-logo { /* Ensure logo is not too large or reposition */
+      font-size: 1.5em;
+    }
+    .header-nav-links {
+      display: none; /* Hide WOMAN/MAN from header on small screens, rely on sidebar */
+    }
+    }
+
+  </style>
+  @*@await RenderSectionAsync("Styles", required: false)*@
+</head>
+<body>
+<div class="page-wrapper" id="pageWrapper">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+    </div>
+    <nav class="sidebar-nav">
+      <ul>
+        <li><a href="#">WOMAN</a></li>
+        <li><a href="#">MAN</a></li>
+        <li><a href="#">ПОДАРОЧНАЯ КАРТА</a></li>
+        <li><a href="#">КОНТАКТЫ</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">Покупателям</div>
+      <ul>
+        <li>
+          <a href="#" class="accordion-toggle">Раздел 1 <i class="fas fa-chevron-right"></i></a>
+          <ul class="accordion-content">
+            <li><a href="#">Подраздел 1.1</a></li>
+            <li><a href="#">Подраздел 1.2</a></li>
+          </ul>
+        </li>
+        <li><a href="#">Раздел 2</a></li>
+      </ul>
+
+      <div class="sidebar-section-title">Для бизнеса</div>
+      <ul>
+        <li><a href="#">Информация для бизнеса</a></li>
+      </ul>
+    </nav>
+    <div class="sidebar-bottom-links">
+      <a href="#" title="Instagram"><i class="fab fa-instagram"></i> Instagram</a>
+      <a href="#" title="Telegram"><i class="fab fa-telegram-plane"></i> Telegram</a>
+    </div>
+    <div class="language-currency-selector">
+      <span>Русский <i class="fas fa-chevron-down"></i></span> <span>BYN <i class="fas fa-chevron-down"></i></span>
+    </div>
+  </aside>
+
+  <header class="site-header">
+    <div class="header-left">
+      <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Toggle Menu">
+        <i class="fas fa-bars"></i> </button>
+      <div class="header-nav-links">
+        <a href="#">WOMAN</a>
+        <a href="#">MAN</a>
+      </div>
+    </div>
+
+    <a href="/" class="header-logo">Z N W R</a>
+
+    <div class="header-right-icons">
+      <a href="#" aria-label="Search"><i class="fas fa-search"></i></a>
+      <a href="#" aria-label="Cart"><i class="fas fa-shopping-bag"></i></a>
+    </div>
+  </header>
+
+  <main class="main-content">
+    @*@RenderBody()*@
+  </main>
+
+</div> <footer class="site-footer">
+  &copy; @DateTime.Now.Year - Z N W R. Все права защищены.
+</footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+    const pageWrapper = document.getElementById('pageWrapper');
+    const siteHeader = document.querySelector('.site-header'); // to adjust its left margin
+    const siteFooter = document.querySelector('.site-footer'); // to adjust its left margin
+
+    if (sidebar && sidebarToggleBtn && pageWrapper) {
+      sidebarToggleBtn.addEventListener('click', function () {
+        sidebar.classList.toggle('expanded');
+        pageWrapper.classList.toggle('sidebar-expanded');
+
+        // Persist sidebar state in localStorage (optional)
+        if (sidebar.classList.contains('expanded')) {
+          localStorage.setItem('sidebarState_znwr', 'expanded');
+        } else {
+          localStorage.setItem('sidebarState_znwr', 'collapsed');
+        }
+      });
+
+      // Check localStorage for sidebar state on page load (optional)
+      const currentSidebarState = localStorage.getItem('sidebarState_znwr');
+      if (currentSidebarState === 'expanded') {
+        sidebar.classList.add('expanded');
+        pageWrapper.classList.add('sidebar-expanded');
+      }
+    }
+
+    // Basic accordion functionality for sidebar (if you use the .accordion-toggle class)
+    const accordionToggles = document.querySelectorAll('.sidebar .accordion-toggle');
+    accordionToggles.forEach(toggle => {
+      toggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        const content = this.nextElementSibling; // Assumes .accordion-content is sibling
+        const icon = this.querySelector('i');
+
+        if (content && content.classList.contains('accordion-content')) {
+          content.classList.toggle('open');
+          this.classList.toggle('open'); // For styling the toggle itself
+        }
+      });
+    });
+  });
+</script>
+@*@await RenderSectionAsync("Scripts", required: false)*@
+</body>
+</html>

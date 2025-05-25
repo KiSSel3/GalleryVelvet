@@ -1,0 +1,21 @@
+@model System.Collections.Generic.IEnumerable<GalleryVelvet.BLL.DTOs.Tag.TagToSidebarDto>
+
+<ul>
+    <li>
+        <a asp-controller="Product"
+           asp-action="Index">
+            WOMAN
+        </a>
+    </li>
+    @foreach (var tag in Model)
+    {
+        <li>
+            <a asp-controller="Product"
+               asp-action="Index"
+               asp-route-tagId="@tag.Id"
+               class="@(ViewContext.RouteData.Values["tagId"]?.ToString() == tag.Id.ToString() ? "active" : "")">
+                @tag.Name
+            </a>
+        </li>
+    }
+</ul>

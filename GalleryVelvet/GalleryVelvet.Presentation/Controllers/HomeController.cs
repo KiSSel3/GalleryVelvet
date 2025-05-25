@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using GalleryVelvet.Presentation.Models;
+using GalleryVelvet.Presentation.Models.Common;
 
 namespace GalleryVelvet.Presentation.Controllers;
 

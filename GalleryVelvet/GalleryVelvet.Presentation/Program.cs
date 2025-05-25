@@ -23,7 +23,7 @@ builder.Services
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
+/*using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     var seeders = scope.ServiceProvider.GetServices<ISeeder>();
@@ -32,7 +32,7 @@ using (var scope = app.Services.CreateScope())
     {
         await seeder.SeedAsync(context);
     }
-}
+}*/
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

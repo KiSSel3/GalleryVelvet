@@ -3,6 +3,7 @@ using System;
 using GalleryVelvet.DAL.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GalleryVelvet.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250525144311_ChangeImageType")]
+    partial class ChangeImageType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,10 +85,6 @@ namespace GalleryVelvet.DAL.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Format")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("Image")
                         .IsRequired()
@@ -270,7 +269,12 @@ namespace GalleryVelvet.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("ProductEntityId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ProductEntityId");
 
                     b.ToTable("Tags", (string)null);
                 });
@@ -382,6 +386,21 @@ namespace GalleryVelvet.DAL.Migrations
                         .IsUnique();
 
                     b.ToTable("UserRoles", (string)null);
+                });
+
+            modelBuilder.Entity("ProductEntitySizeEntity", b =>
+                {
+                    b.Property<Guid>("ProductsId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SizesId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ProductsId", "SizesId");
+
+                    b.HasIndex("SizesId");
+
+                    b.ToTable("ProductEntitySizeEntity");
                 });
 
             modelBuilder.Entity("RoleEntityUserEntity", b =>
@@ -502,6 +521,13 @@ namespace GalleryVelvet.DAL.Migrations
                     b.Navigation("Category");
                 });
 
+            modelBuilder.Entity("GalleryVelvet.Domain.Entities.TagEntity", b =>
+                {
+                    b.HasOne("GalleryVelvet.Domain.Entities.ProductEntity", null)
+                        .WithMany("Tags")
+                        .HasForeignKey("ProductEntityId");
+                });
+
             modelBuilder.Entity("GalleryVelvet.Domain.M2M.ProductSizeEntity", b =>
                 {
                     b.HasOne("GalleryVelvet.Domain.Entities.ProductEntity", "Product")
@@ -559,6 +585,21 @@ namespace GalleryVelvet.DAL.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ProductEntitySizeEntity", b =>
+                {
+                    b.HasOne("GalleryVelvet.Domain.Entities.ProductEntity", null)
+                        .WithMany()
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("GalleryVelvet.Domain.Entities.SizeEntity", null)
+                        .WithMany()
+                        .HasForeignKey("SizesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("RoleEntityUserEntity", b =>
                 {
                     b.HasOne("GalleryVelvet.Domain.Entities.RoleEntity", null)
@@ -607,6 +648,8 @@ namespace GalleryVelvet.DAL.Migrations
                     b.Navigation("ProductSizes");
 
                     b.Navigation("ProductTags");
+
+                    b.Navigation("Tags");
                 });
 
             modelBuilder.Entity("GalleryVelvet.Domain.Entities.RoleEntity", b =>

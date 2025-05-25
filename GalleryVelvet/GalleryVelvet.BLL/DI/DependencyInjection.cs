@@ -17,6 +17,10 @@ public static class DependencyInjection
     private static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<ITagService, TagService>();
+        services.AddScoped<ICartItemService, CartItemService>();
         
         return services;
     }

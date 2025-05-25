@@ -1,0 +1,844 @@
+@using GalleryVelvet.BLL.Enums
+@model GalleryVelvet.Presentation.Models.Product.ProductCatalogViewModel
+
+@{
+    Layout = "_Layout";
+    
+    var categoryPart = Model.SelectedCategoryId.HasValue ? $"&categoryId={Model.SelectedCategoryId}" : "";
+    var searchPart = !string.IsNullOrWhiteSpace(Model.SearchQuery) ? $"&search={Model.SearchQuery}" : "";
+    var sortPart = $"&sortOrder={(int)Model.SortOrder}";
+    var discountPart = Model.OnlyDiscounted ? "&onlyDiscounted=true" : "";
+    var tagPart = Model.SelectedTagId.HasValue ? $"&tagId={Model.SelectedTagId}" : "";
+    var extraQuery = categoryPart + searchPart + sortPart + discountPart + tagPart;
+    var currentSort = (int)Model.SortOrder;
+}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .catalog-controls {
+        background: #fff;
+        padding: 20px 0;
+        border-bottom: 1px solid #e5e5e5;
+        position: sticky;
+        top: 80px;
+        z-index: 100;
+    }
+
+    .catalog-controls-container {
+        width: 100%;
+        padding: 0 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .controls-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .sort-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: none;
+        border: none;
+        font-size: 12px;
+        font-weight: 300;
+        color: #000;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 8px 0;
+    }
+
+    .sort-btn svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .controls-right {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .sort-dropdown {
+        position: fixed;
+        top: 0;
+        right: -300px;
+        width: 300px;
+        height: 100vh;
+        background: #fff;
+        z-index: 2000;
+        padding: 80px 30px 30px;
+        transition: right 0.3s ease;
+        box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .sort-dropdown.open {
+        right: 0;
+    }
+
+    .filters-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .filters-title {
+        font-size: 16px;
+        font-weight: 400;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .filters-close {
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #666;
+    }
+
+    .sort-option {
+        display: block;
+        width: 100%;
+        padding: 15px 0;
+        border: none;
+        background: none;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 300;
+        color: #666;
+        border-bottom: 1px solid #f0f0f0;
+        cursor: pointer;
+        transition: color 0.3s ease;
+    }
+
+    .sort-option:hover,
+    .sort-option.active {
+        color: #000;
+    }
+
+    .catalog-content {
+        width: 100%;
+        padding: 40px 20px;
+        box-sizing: border-box;
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        margin-bottom: 60px;
+    }
+
+    .product-card {
+        background: #fff;
+        overflow: hidden;
+        transition: transform 0.3s ease;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .product-image-container {
+        position: relative;
+        overflow: hidden;
+        height: 600px;
+    }
+
+    .product-image-slider {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease, opacity 0.5s ease;
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+    }
+
+    .product-image.active {
+        opacity: 1;
+    }
+
+    .product-card:hover .product-image {
+        transform: scale(1.05);
+    }
+
+    .product-sale-badge {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        background: #ff4444;
+        color: white;
+        padding: 5px 10px;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        z-index: 10;
+    }
+    
+    .slider-dots {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 6px;
+        z-index: 10;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .product-card:hover .slider-dots {
+        opacity: 1;
+    }
+
+    .slider-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .slider-dot.active {
+        background: rgba(255, 255, 255, 0.9);
+        transform: scale(1.2);
+    }
+
+    .slider-dot:hover {
+        background: rgba(255, 255, 255, 0.8);
+    }
+    
+    .image-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.8);
+        border: none;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 10;
+        font-size: 12px;
+        color: #000;
+    }
+
+    .product-card:hover .image-nav {
+        opacity: 1;
+    }
+
+    .image-nav:hover {
+        background: rgba(255, 255, 255, 1);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .image-nav.prev {
+        left: 10px;
+    }
+
+    .image-nav.next {
+        right: 10px;
+    }
+
+    .product-info {
+        left: 15px;
+        padding: 5px 10px;
+    }
+
+    .product-name {
+        font-size: 12px;
+        font-weight: 400;
+        color: #000;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .product-price {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .product-price-old {
+        font-size: 12px;
+        color: #ff4444;
+        text-decoration: line-through;
+    }
+
+    .product-price-new {
+        font-size: 12px;
+        color: #000;
+        font-weight: 400;
+    }
+
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        margin-top: 60px;
+        padding: 40px 0;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 5px;
+        align-items: center;
+    }
+
+    .pagination-btn {
+        padding: 10px 15px;
+        border: 1px solid #e5e5e5;
+        background: #fff;
+        color: #666;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 300;
+        transition: all 0.3s ease;
+        min-width: 40px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .pagination-btn:hover {
+        border-color: #000;
+        color: #000;
+    }
+
+    .pagination-btn.active {
+        background: #000;
+        color: #fff;
+        border-color: #000;
+    }
+
+    .pagination-btn.disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+        pointer-events: none;
+    }
+
+    .pagination-info {
+        font-size: 12px;
+        color: #666;
+        margin: 0 20px;
+    }
+
+    .pagination-btn.nav {
+        padding: 10px 12px;
+    }
+
+    .pagination-ellipsis {
+        padding: 10px 5px;
+        color: #999;
+        font-size: 12px;
+    }
+
+    @@media (max-width: 1024px) {
+        .products-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .pagination {
+            gap: 3px;
+        }
+
+        .pagination-btn {
+            padding: 8px 12px;
+            min-width: 35px;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .products-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .sort-dropdown {
+            width: 100%;
+            right: -100%;
+        }
+
+        .catalog-controls-container {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .controls-left {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .pagination-container {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .pagination {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pagination-info {
+            margin: 0;
+        }
+    }
+
+    .search-submit-btn {
+        background-color: #000;
+        color: white;
+        margin-top: 15px;
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: 500;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .search-submit-btn:hover {
+        background-color: #333;
+    }
+    
+    .product-image.loading {
+        background: linear-gradient(90deg, #f0f0f0 25%, transparent 37%, #f0f0f0 63%);
+        background-size: 400% 100%;
+        animation: shimmer 1.5s ease-in-out infinite;
+    }
+
+    @@keyframes shimmer {
+         0% { background-position: 100% 0; }
+         100% { background-position: -100% 0; }
+     }
+</style>
+
+<div class="catalog-controls">
+    <div class="catalog-controls-container">
+        <div class="controls-left">
+            <button class="sort-btn" id="sortBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="7" y1="12" x2="21" y2="12"></line>
+                    <line x1="12" y1="18" x2="21" y2="18"></line>
+                </svg>
+                Сортировка / @Model.SortOrder.ToDisplayName()
+            </button>
+            <button class="sort-btn" id="searchBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                Поиск
+            </button>
+        </div>
+        <div class="controls-right">
+            <span>Товары @(Model.Products.MetaData.CurrentPage == 1 ? 1 : (Model.Products.MetaData.CurrentPage - 1) * Model.Products.MetaData.PageSize + 1)-@(Math.Min(Model.Products.MetaData.CurrentPage * Model.Products.MetaData.PageSize, Model.Products.MetaData.TotalCount)) из @Model.Products.MetaData.TotalCount</span>
+        </div>
+    </div>
+</div>
+
+<div class="sort-dropdown" id="sortDropdown">
+    <div class="filters-header">
+        <h3 class="filters-title">Сортировка</h3>
+        <button class="filters-close" id="sortClose">×</button>
+    </div>
+    <button class="sort-option @(currentSort == 1 ? "active" : "")" data-sort="1">Низкая цена</button>
+    <button class="sort-option @(currentSort == 2 ? "active" : "")" data-sort="2">Высокая цена</button>
+    <button class="sort-option @(currentSort == 0 ? "active" : "")" data-sort="0">Без сортировки</button>
+</div>
+
+<div class="sort-dropdown" id="searchSidebar">
+    <div class="filters-header">
+        <h3 class="filters-title">Поиск</h3>
+        <button class="filters-close" id="searchClose">×</button>
+    </div>
+
+    <form id="searchForm" method="get" action="/Product">
+        <input type="hidden" name="categoryId" value="@Model.SelectedCategoryId" />
+        <input type="hidden" name="sortOrder" value="@currentSort" />
+        <input type="hidden" name="onlyDiscounted" value="@Model.OnlyDiscounted" />
+        <input type="hidden" name="tagId" value="@Model.SelectedTagId" />
+
+        <input type="text" name="search" style="border: 1px solid #ccc; padding: 12px; width: 100%;"
+               value="@Model.SearchQuery" placeholder="Введите название..." />
+
+        <button type="submit" class="search-submit-btn">
+            Найти
+        </button>
+    </form>
+</div>
+
+
+<main class="catalog-content">
+    <div class="products-grid">
+        @foreach (var product in Model.Products)
+        {
+            <div class="product-card" data-product-id="@product.Id">
+                <div class="product-image-container">
+                    <div class="product-image-slider" data-images='@Html.Raw(Json.Serialize(product.Images.Select(img => new {
+                                                                       Image = img.Image,
+                                                                       Format = img.Format,
+                                                                       Alt = product.Name
+                                                                   })))'>
+                        @if (product.Images.Any())
+                        {
+                            @for (int i = 0; i < product.Images.Count(); i++)
+                            {
+                                var image = product.Images.ElementAt(i);
+                                var base64Image = image.Image;
+                                var format = image.Format;
+                                <img src="@(string.IsNullOrWhiteSpace(base64Image) ? "/images/no-image_0.jpg" : $"data:image/{format};base64,{base64Image}")"
+                                     alt="@(product.Name)"
+                                     class="product-image @(i == 0 ? "active" : "")"
+                                     data-index="@i" />
+                            }
+                        }
+                        else
+                        {
+                            <img src="/images/no-image_0.jpg" alt="@product.Name" class="product-image active" data-index="0" />
+                        }
+                    </div>
+
+                    @if (product.Images.Count() > 1)
+                    {
+                        <button class="image-nav prev" onclick="changeImage(this, -1)">‹</button>
+                        <button class="image-nav next" onclick="changeImage(this, 1)">›</button>
+
+                        <div class="slider-dots">
+                            @for (int i = 0; i < product.Images.Count(); i++)
+                            {
+                                <span class="slider-dot @(i == 0 ? "active" : "")" onclick="setImage(this, @i)" data-index="@i"></span>
+                            }
+                        </div>
+                    }
+
+                    @if (product.DiscountPrice.HasValue)
+                    {
+                        <div class="product-sale-badge">SALE</div>
+                    }
+                </div>
+
+                <div class="product-info">
+                    <div class="product-name">@product.Name</div>
+                    <div class="product-price">
+                        @if (product.DiscountPrice.HasValue)
+                        {
+                            <span class="product-price-old">@product.Price.ToString("N0") BYN</span>
+                            <span class="product-price-new">@product.DiscountPrice.Value.ToString("N0") BYN</span>
+                        }
+                        else
+                        {
+                            <span class="product-price-new">@product.Price.ToString("N0") BYN</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    
+    @if (Model.Products.MetaData.TotalPages > 1)
+    {
+        <div class="pagination-container">
+            <div class="pagination">
+                @if (Model.Products.MetaData.HasPrevious)
+                {
+                    <a href="?pageNumber=@(Model.Products.MetaData.CurrentPage - 1)@extraQuery" class="pagination-btn nav">‹</a>
+                }
+                else
+                {
+                    <span class="pagination-btn nav disabled">‹</span>
+                }
+                
+                @{
+                    int startPage = Math.Max(1, Model.Products.MetaData.CurrentPage - 2);
+                    int endPage = Math.Min(Model.Products.MetaData.TotalPages, Model.Products.MetaData.CurrentPage + 2);
+
+                    if (startPage > 1)
+                    {
+                        <a href="?pageNumber=1@extraQuery" class="pagination-btn">1</a>
+                        if (startPage > 2)
+                        {
+                            <span class="pagination-ellipsis">...</span>
+                        }
+                    }
+
+                    for (int i = startPage; i <= endPage; i++)
+                    {
+                        if (i == Model.Products.MetaData.CurrentPage)
+                        {
+                            <span class="pagination-btn active">@i</span>
+                        }
+                        else
+                        {
+                            <a href="?pageNumber=@i@extraQuery" class="pagination-btn">@i</a>
+                        }
+                    }
+
+                    if (endPage < Model.Products.MetaData.TotalPages)
+                    {
+                        if (endPage < Model.Products.MetaData.TotalPages - 1)
+                        {
+                            <span class="pagination-ellipsis">...</span>
+                        }
+                        <a href="?pageNumber=@Model.Products.MetaData.TotalPages@extraQuery" class="pagination-btn">@Model.Products.MetaData.TotalPages</a>
+                    }
+                }
+                
+                @if (Model.Products.MetaData.HasNext)
+                {
+                    <a href="?pageNumber=@(Model.Products.MetaData.CurrentPage + 1)@extraQuery" class="pagination-btn nav">›</a>
+                }
+                else
+                {
+                    <span class="pagination-btn nav disabled">›</span>
+                }
+            </div>
+
+            <div class="pagination-info">
+                Страница @Model.Products.MetaData.CurrentPage из @Model.Products.MetaData.TotalPages
+            </div>
+        </div>
+    }
+</main>
+
+<script>
+    const sortBtn = document.getElementById('sortBtn');
+    const sortDropdown = document.getElementById('sortDropdown');
+    const sortClose = document.getElementById('sortClose');
+
+    function toggleSort() {
+        sortDropdown.classList.toggle('open');
+        document.body.style.overflow = sortDropdown.classList.contains('open') ? 'hidden' : '';
+    }
+
+    sortBtn.addEventListener('click', toggleSort);
+    sortClose.addEventListener('click', toggleSort);
+
+    document.querySelectorAll('.sort-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const sortOrder = this.dataset.sort;
+
+            const currentPage = 1;
+            const categoryId = '@Model.SelectedCategoryId';
+            const tagId = '@Model.SelectedTagId';
+            const search = '@Model.SearchQuery'.trim();
+
+            let url = `/Product?pageNumber=${currentPage}&sortOrder=${sortOrder}`;
+            if (categoryId) url += `&categoryId=${categoryId}`;
+            if (tagId) url += `&tagId=${tagId}`;
+            if (search) url += `&search=${encodeURIComponent(search)}`;
+
+            window.location.href = url;
+        });
+    });
+
+    const searchBtn = document.getElementById('searchBtn');
+    const searchSidebar = document.getElementById('searchSidebar');
+    const searchClose = document.getElementById('searchClose');
+
+    function toggleSearch() {
+        searchSidebar.classList.toggle('open');
+        document.body.style.overflow = searchSidebar.classList.contains('open') ? 'hidden' : '';
+    }
+
+    searchBtn?.addEventListener('click', toggleSearch);
+    searchClose?.addEventListener('click', toggleSearch);
+
+    function changeImage(button, direction) {
+        const card = button.closest('.product-card');
+        const slider = card.querySelector('.product-image-slider');
+        const images = slider.querySelectorAll('.product-image');
+        const dots = card.querySelectorAll('.slider-dot');
+        const currentActive = slider.querySelector('.product-image.active');
+        const currentIndex = parseInt(currentActive.dataset.index);
+
+        let newIndex = currentIndex + direction;
+
+        if (newIndex >= images.length) newIndex = 0;
+        if (newIndex < 0) newIndex = images.length - 1;
+
+        images.forEach((img, idx) => {
+            img.classList.remove('active');
+            img.style.opacity = '0';
+        });
+        
+        images[newIndex].classList.add('active');
+        images[newIndex].style.opacity = '1';
+
+        if (dots.length > 0) {
+            dots.forEach(dot => dot.classList.remove('active'));
+            dots[newIndex].classList.add('active');
+            images[newIndex].style.opacity = '1';
+        }
+    }
+
+    function setImage(dot, index) {
+        const card = dot.closest('.product-card');
+        const slider = card.querySelector('.product-image-slider');
+        const images = slider.querySelectorAll('.product-image');
+        const dots = card.querySelectorAll('.slider-dot');
+
+        images.forEach(img => img.classList.remove('active'));
+        images[index].classList.add('active');
+
+        dots.forEach(dot => dot.classList.remove('active'));
+        dot.classList.add('active');
+    }
+    
+    let autoSlideIntervals = new Map();
+
+    function startAutoSlide(card) {
+        const images = card.querySelectorAll('.product-image');
+        if (images.length <= 1) return;
+
+        const interval = setInterval(() => {
+            const nextBtn = card.querySelector('.image-nav.next');
+            if (nextBtn) changeImage(nextBtn, 1);
+        }, 3000);
+
+        autoSlideIntervals.set(card, interval);
+    }
+
+    function stopAutoSlide(card) {
+        const interval = autoSlideIntervals.get(card);
+        if (interval) {
+            clearInterval(interval);
+            autoSlideIntervals.delete(card);
+        }
+    }
+
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('click', function(e) {
+            if (!e.target.closest('.image-nav, .slider-dot, .slider-dots')) {
+                const productId = this.dataset.productId;
+                window.location.href = `/Product/Details/${productId}`;
+
+            }
+        });
+        
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    const imageObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.style.opacity = '1';
+                img.classList.remove('loading');
+            }
+        });
+    });
+
+    document.querySelectorAll('.product-image').forEach(img => {
+        img.style.opacity = '0.8';
+        img.style.transition = 'opacity 0.3s ease';
+        img.classList.add('loading');
+        imageObserver.observe(img);
+    });
+    
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.product-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            card.style.transitionDelay = `${index * 0.1}s`;
+
+            setTimeout(() => {
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 100 + index * 100);
+        });
+        
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                const focusedCard = document.querySelector('.product-card:hover');
+                if (focusedCard) {
+                    e.preventDefault();
+                    const direction = e.key === 'ArrowRight' ? 1 : -1;
+                    const navBtn = focusedCard.querySelector('.image-nav.next');
+                    if (navBtn) changeImage(navBtn, direction);
+                }
+            }
+        });
+    });
+    
+    function throttle(func, limit) {
+        let inThrottle;
+        return function() {
+            const args = arguments;
+            const context = this;
+            if (!inThrottle) {
+                func.apply(context, args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        }
+    }
+    
+    document.querySelectorAll('.pagination-btn').forEach(btn => {
+        if (!btn.classList.contains('disabled')) {
+            btn.addEventListener('click', function(e) {
+                if (this.href) {
+                    e.preventDefault();
+                    
+                    this.style.opacity = '0.6';
+                    this.style.pointerEvents = 'none';
+                    
+                    document.querySelectorAll('.product-card').forEach(card => {
+                        card.style.opacity = '0.3';
+                        card.style.transform = 'translateY(10px)';
+                    });
+                    
+                    setTimeout(() => {
+                        window.location.href = this.href;
+                    }, 300);
+                }
+            });
+        }
+    });
+</script>

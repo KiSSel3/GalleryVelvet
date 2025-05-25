@@ -1,0 +1,28 @@
+@model IEnumerable<GalleryVelvet.Presentation.Models.Category.CategoryToSidebarViewModel>
+
+@{
+    var columns = Model
+        .Select((value, index) => new { value, index })
+        .GroupBy(x => x.index / 6)
+        .Select(g => g.Select(x => x.value).ToList())
+        .ToList();
+}
+
+@foreach (var column in columns)
+{
+    <div class="megamenu-column">
+        <ul>
+            @foreach (var category in column)
+            {
+                <li>
+                    <a asp-controller="Product"
+                       asp-action="Index"
+                       asp-route-categoryId="@category.Id"
+                       class="@(ViewContext.RouteData.Values["categoryId"]?.ToString() == category.Id.ToString() ? "active" : "")">
+                        @category.Name <span class="count">@category.ProductCount</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+}
