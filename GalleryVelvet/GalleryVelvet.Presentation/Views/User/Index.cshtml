@@ -1,0 +1,806 @@
+@model GalleryVelvet.Presentation.Models.User.UserProfilePageViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Личный кабинет";
+}
+
+<style>
+    :root {
+        --primary-color: #000000;
+        --secondary-color: #333333;
+        --background-white: #ffffff;
+        --background-light: #f8f9fa;
+        --text-primary: #000000;
+        --text-secondary: #666666;
+        --text-muted: #999999;
+        --border-light: #e5e5e5;
+        --border-medium: #cccccc;
+        --error-color: #dc3545;
+        --success-color: #28a745;
+        --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.08);
+        --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.1);
+        --transition: all 0.2s ease;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 30px 20px;
+        background-color: var(--background-light);
+        min-height: calc(100vh - 70px);
+    }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 35px;
+        padding-bottom: 25px;
+        border-bottom: 2px solid var(--primary-color);
+    }
+
+    .profile-title {
+        font-size: 32px;
+        font-weight: 300;
+        color: var(--primary-color);
+        margin-bottom: 12px;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .profile-subtitle {
+        font-size: 16px;
+        color: var(--text-secondary);
+        font-weight: 300;
+        letter-spacing: 0.5px;
+    }
+
+    .profile-tabs {
+        display: flex;
+        background: var(--background-white);
+        border: 1px solid var(--border-light);
+        margin-bottom: 30px;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 30px;
+    }
+
+    .tab-btn {
+        flex: 1;
+        padding: 20px 30px;
+        background: none;
+        border: none;
+        border-right: 1px solid var(--border-light);
+        font-size: 13px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: var(--transition);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+    }
+
+    .tab-btn:last-child {
+        border-right: none;
+    }
+
+    .tab-btn:hover {
+        background-color: var(--background-light);
+        color: var(--primary-color);
+    }
+
+    .tab-btn.active {
+        background-color: var(--primary-color);
+        color: var(--background-white);
+        font-weight: 600;
+    }
+
+    .tab-content {
+        display: none;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    .profile-form {
+        background: var(--background-white);
+        padding: 50px;
+        border: 1px solid var(--border-light);
+        max-width: 700px;
+        margin: 0 auto;
+        box-shadow: var(--shadow-light);
+    }
+
+    .form-section {
+        margin-bottom: 40px;
+    }
+
+    .form-section:last-of-type {
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 500;
+        color: var(--primary-color);
+        margin-bottom: 25px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 1px solid var(--border-light);
+        padding-bottom: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid var(--border-light);
+        background: var(--background-white);
+        font-size: 14px;
+        font-family: inherit;
+        color: var(--text-primary);
+        transition: var(--transition);
+        font-weight: 400;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        background-color: #fafafa;
+    }
+
+    .form-input::placeholder {
+        color: var(--text-muted);
+        font-weight: 300;
+    }
+
+    .form-input.error {
+        border-color: var(--error-color);
+        background-color: #fff5f5;
+    }
+
+    .error-message {
+        color: var(--error-color);
+        font-size: 12px;
+        margin-top: 8px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .success-message {
+        background-color: var(--success-color);
+        color: white;
+        padding: 15px 20px;
+        margin-bottom: 25px;
+        font-size: 14px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-left: 4px solid #1e7e34;
+    }
+
+    .submit-btn {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 18px 40px;
+        border: none;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: var(--transition);
+        min-width: 200px;
+    }
+
+    .submit-btn:hover {
+        background-color: var(--secondary-color);
+    }
+
+    .submit-btn:active {
+        transform: translateY(1px);
+    }
+
+    .orders-list {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .order-card {
+        background: var(--background-white);
+        padding: 30px;
+        border: 1px solid var(--border-light);
+        box-shadow: var(--shadow-light);
+        transition: var(--transition);
+    }
+
+    .order-card:hover {
+        box-shadow: var(--shadow-medium);
+        border-color: var(--border-medium);
+    }
+
+    .order-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .order-info {
+        flex: 1;
+    }
+
+    .order-number {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .order-date {
+        font-size: 13px;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+        font-weight: 400;
+    }
+
+    .order-status {
+        font-size: 11px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        border: 1px solid var(--border-medium);
+        padding: 4px 12px;
+        display: inline-block;
+    }
+
+    .order-summary {
+        text-align: right;
+    }
+
+    .order-total {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--primary-color);
+        margin-bottom: 8px;
+    }
+
+    .order-items-count {
+        font-size: 12px;
+        color: var(--text-secondary);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .order-items {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .order-item {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        padding: 20px;
+        border: 1px solid var(--border-light);
+        background-color: #fafafa;
+        transition: var(--transition);
+    }
+
+    .order-item:hover {
+        background-color: var(--background-white);
+        border-color: var(--border-medium);
+    }
+
+    .item-image {
+        width: 80px;
+        height: 100px;
+        object-fit: cover;
+        flex-shrink: 0;
+        border: 1px solid var(--border-light);
+    }
+
+    .item-details {
+        flex: 1;
+    }
+
+    .item-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .item-options {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-bottom: 8px;
+        line-height: 1.5;
+        font-weight: 400;
+    }
+
+    .item-price {
+        font-size: 13px;
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: var(--background-white);
+        border: 1px solid var(--border-light);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .empty-state h3 {
+        font-size: 24px;
+        font-weight: 300;
+        margin-bottom: 16px;
+        color: var(--text-primary);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .empty-state p {
+        font-size: 14px;
+        margin-bottom: 32px;
+        color: var(--text-secondary);
+        font-weight: 400;
+    }
+
+    .shop-btn {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 15px 30px;
+        text-decoration: none;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        transition: var(--transition);
+        display: inline-block;
+        border: 2px solid var(--primary-color);
+    }
+
+    .shop-btn:hover {
+        background-color: transparent;
+        color: var(--primary-color);
+    }
+
+   @@media (max-width: 768px) {
+    .profile-container {
+        padding: 20px 15px;
+    }
+
+    .profile-title {
+        font-size: 24px;
+    }
+
+    .profile-tabs {
+        flex-direction: column;
+        max-width: none;
+        margin: 0 0 30px 0;
+    }
+
+    .tab-btn {
+        border-right: none;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .tab-btn:last-child {
+        border-bottom: none;
+    }
+
+    .profile-form {
+        padding: 30px 20px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .order-header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .order-summary {
+        text-align: left;
+    }
+
+    .order-item {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .item-image {
+        width: 100%;
+        height: 200px;
+        max-width: 200px;
+    }
+
+    .empty-state {
+        padding: 50px 20px;
+    }
+    }
+
+    @@media (max-width: 480px) {
+    .profile-container {
+        padding: 15px 10px;
+    }
+
+    .profile-form {
+        padding: 20px 15px;
+    }
+
+    .form-input {
+        padding: 12px 15px;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .order-card {
+        padding: 20px 15px;
+    }
+    }
+
+    .form-input:disabled {
+        background-color: #f5f5f5;
+        color: var(--text-muted);
+        cursor: not-allowed;
+    }
+
+    .submit-btn:disabled {
+        background-color: var(--text-muted);
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .submit-btn:disabled:hover {
+        background-color: var(--text-muted);
+    }
+    
+    .form-input:focus,
+    .tab-btn:focus,
+    .submit-btn:focus,
+    .shop-btn:focus {
+        box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .fade-in {
+        animation: fadeInUp 0.4s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<main class="main-content">
+    <div class="profile-container">
+        <div class="profile-header fade-in">
+            <h1 class="profile-title">Личный кабинет</h1>
+            <p class="profile-subtitle">Управление профилем и история заказов</p>
+        </div>
+
+        @if (TempData["Success"] != null)
+        {
+        <div class="success-message fade-in">
+            @TempData["Success"]
+        </div>
+        }
+
+        @if (TempData["Error"] != null)
+        {
+        <div class="error-message fade-in" style="background-color: var(--error-color); color: white; padding: 15px 20px; margin-bottom: 25px; border-left: 4px solid #c82333;">
+            @TempData["Error"]
+        </div>
+        }
+
+        <div class="profile-tabs fade-in">
+            <a href="@Url.Action("Index", new { tab = "profile" })"
+               class="tab-btn @(Model.ActiveTab == "profile" ? "active" : "")">
+                Профиль
+            </a>
+            <a href="@Url.Action("Index", new { tab = "orders" })"
+               class="tab-btn @(Model.ActiveTab == "orders" ? "active" : "")">
+                История заказов
+            </a>
+        </div>
+
+        <div class="tab-content @(Model.ActiveTab == "profile" ? "active" : "")" id="profile-tab">
+            <form action="@Url.Action("UpdateProfile")" method="post" class="profile-form fade-in">
+                @Html.AntiForgeryToken()
+
+                <div class="form-section">
+                    <h2 class="section-title">Основная информация</h2>
+
+                    <div class="form-group">
+                        <input name="Login"
+                               class="form-input @(ViewData.ModelState["Login"]?.Errors.Count > 0 ? "error" : "")"
+                               placeholder="Логин *"
+                               value="@Model.Profile?.Login"
+                               required />
+                        @if (ViewData.ModelState["Login"]?.Errors.Count > 0)
+                        {
+                        <span class="error-message">@ViewData.ModelState["Login"]?.Errors.FirstOrDefault()?.ErrorMessage</span>
+                        }
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <input name="FirstName"
+                                   class="form-input @(ViewData.ModelState["FirstName"]?.Errors.Count > 0 ? "error" : "")"
+                                   placeholder="Имя"
+                                   value="@Model.Profile?.FirstName" />
+                            @if (ViewData.ModelState["FirstName"]?.Errors.Count > 0)
+                            {
+                            <span class="error-message">@ViewData.ModelState["FirstName"]?.Errors.FirstOrDefault()?.ErrorMessage</span>
+                            }
+                        </div>
+                        <div class="form-group">
+                            <input name="LastName"
+                                   class="form-input @(ViewData.ModelState["LastName"]?.Errors.Count > 0 ? "error" : "")"
+                                   placeholder="Фамилия"
+                                   value="@Model.Profile?.LastName" />
+                            @if (ViewData.ModelState["LastName"]?.Errors.Count > 0)
+                            {
+                            <span class="error-message">@ViewData.ModelState["LastName"]?.Errors.FirstOrDefault()?.ErrorMessage</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h2 class="section-title">Контактная информация</h2>
+
+                    <div class="form-group">
+                        <input name="Email"
+                               type="email"
+                               class="form-input @(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "error" : "")"
+                               placeholder="Email"
+                               value="@Model.Profile?.Email" />
+                        @if (ViewData.ModelState["Email"]?.Errors.Count > 0)
+                        {
+                        <span class="error-message">@ViewData.ModelState["Email"]?.Errors.FirstOrDefault()?.ErrorMessage</span>
+                        }
+                    </div>
+
+                    <div class="form-group">
+                        <input name="PhoneNumber"
+                               type="tel"
+                               class="form-input @(ViewData.ModelState["PhoneNumber"]?.Errors.Count > 0 ? "error" : "")"
+                               placeholder="Номер телефона"
+                               value="@Model.Profile?.PhoneNumber" />
+                        @if (ViewData.ModelState["PhoneNumber"]?.Errors.Count > 0)
+                        {
+                        <span class="error-message">@ViewData.ModelState["PhoneNumber"]?.Errors.FirstOrDefault()?.ErrorMessage</span>
+                        }
+                    </div>
+                </div>
+
+                @if (ViewData.ModelState.Where(x => string.IsNullOrEmpty(x.Key)).Any(x => x.Value?.Errors.Count > 0))
+                {
+                <div class="error-message" style="margin-bottom: 20px;">
+                    @foreach (var error in ViewData.ModelState.Where(x => string.IsNullOrEmpty(x.Key)).SelectMany(x => x.Value?.Errors ?? []))
+                    {
+                    <div>@error.ErrorMessage</div>
+                    }
+                </div>
+                }
+
+                <button type="submit" class="submit-btn">
+                    Сохранить изменения
+                </button>
+            </form>
+        </div>
+
+        <div class="tab-content @(Model.ActiveTab == "orders" ? "active" : "")" id="orders-tab">
+            @if (Model.Orders?.Any() == true)
+            {
+            <div class="orders-list">
+                @foreach (var order in Model.Orders)
+                {
+                <div class="order-card fade-in">
+                    <div class="order-header">
+                        <div class="order-info">
+                            <div class="order-number">Заказ #@order.Id.ToString("N")[..8].ToUpper()</div>
+                            <div class="order-date">@order.OrderDate.ToString("dd.MM.yyyy HH:mm")</div>
+                            <div class="order-status">@order.OrderStatus</div>
+                        </div>
+                        <div class="order-summary">
+                            <div class="order-total">@order.TotalAmount.ToString("N0") BYN</div>
+                            <div class="order-items-count">@order.ItemsCount товар(-ов)</div>
+                        </div>
+                    </div>
+
+                    <div class="order-items">
+                        @foreach (var item in order.OrderItems)
+                        {
+                        var imageSrc = string.IsNullOrWhiteSpace(item.ProductImage)
+                        ? "/images/no-image_0.jpg"
+                        : $"data:image/{item.ImageFormat ?? "jpeg"};base64,{item.ProductImage}";
+
+                        <div class="order-item">
+                            <img src="@imageSrc" alt="@item.ProductName" class="item-image" />
+                            <div class="item-details">
+                                <div class="item-name">@item.ProductName</div>
+                                <div class="item-options">
+                                    Размер: @item.SizeLabel<br />
+                                    Количество: @item.Quantity шт.
+                                </div>
+                                <div class="item-price">@item.Price.ToString("N0") BYN</div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+            }
+            else
+            {
+            <div class="empty-state fade-in">
+                <h3>У вас пока нет заказов</h3>
+                <p>Начните покупки в нашем интернет-магазине</p>
+                <a href="@Url.Action("Index", "Product")" class="shop-btn">
+                    Перейти к покупкам
+                </a>
+            </div>
+            }
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fadeElements = document.querySelectorAll('.fade-in');
+        fadeElements.forEach((el, index) => {
+            el.style.animationDelay = `${index * 0.1}s`;
+        });
+
+        const formInputs = document.querySelectorAll('.form-input');
+
+        formInputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.borderColor = 'var(--primary-color)';
+            });
+
+            input.addEventListener('blur', function() {
+                if (!this.value && !this.classList.contains('error')) {
+                    this.style.borderColor = 'var(--border-light)';
+                }
+            });
+
+            input.addEventListener('input', function() {
+                if (this.classList.contains('error') && this.value.trim()) {
+                    this.classList.remove('error');
+                    this.style.borderColor = 'var(--primary-color)';
+                    const errorMsg = this.parentElement.querySelector('.error-message');
+                    if (errorMsg) {
+                        errorMsg.style.opacity = '0';
+                    }
+                }
+            });
+        });
+
+        const phoneInput = document.querySelector('input[name="PhoneNumber"]');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+
+                if (value.startsWith('375')) {
+                    value = value.slice(3);
+                }
+
+                if (value.length >= 2) {
+                    value = `+375 (${value.slice(0, 2)}) ${value.slice(2, 5)}-${value.slice(5, 7)}-${value.slice(7, 9)}`;
+                } else if (value.length > 0) {
+                    value = '+375 ' + value;
+                } else {
+                    value = '';
+                }
+
+                e.target.value = value;
+            });
+
+            phoneInput.addEventListener('focus', function() {
+                if (!this.value) {
+                    this.value = '+375 ';
+                }
+            });
+        }
+
+        const form = document.querySelector('.profile-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                console.log('Form submitting...');
+                
+                const formData = new FormData(form);
+                for (let [key, value] of formData.entries()) {
+                    console.log(key, value);
+                }
+                
+                const phoneInput = document.getElementById('phoneNumber');
+                if (phoneInput && phoneInput.value) {
+                    const phoneValue = phoneInput.value.replace(/\D/g, '');
+                    if (phoneValue.startsWith('375') && phoneValue.length === 12) {
+                        phoneInput.value = `+${phoneValue}`;
+                    } else if (phoneValue.length === 9) {
+                        phoneInput.value = `+375${phoneValue}`;
+                    }
+                }
+
+                const submitBtn = form.querySelector('.submit-btn');
+                submitBtn.style.opacity = '0.7';
+                submitBtn.textContent = 'Сохранение...';
+                submitBtn.disabled = true;
+            });
+        }
+        
+        const orderCards = document.querySelectorAll('.order-card');
+        orderCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>

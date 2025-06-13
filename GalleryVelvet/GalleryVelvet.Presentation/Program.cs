@@ -2,6 +2,7 @@ using GalleryVelvet.BLL.DI;
 using GalleryVelvet.DAL.DI;
 using GalleryVelvet.DAL.Infrastructure;
 using GalleryVelvet.DAL.Infrastructure.Seeders.Interfaces;
+using GalleryVelvet.Presentation.Mappers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.HttpOnly = true;
         options.SlidingExpiration = true;
     });
+
+MappingConfig.ConfigureUserMappings();
 
 builder.Services
     .AddDataAccessLayerServices(builder.Configuration)

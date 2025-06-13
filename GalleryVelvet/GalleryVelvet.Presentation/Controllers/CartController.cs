@@ -1,5 +1,7 @@
 using System.Security.Claims;
+using GalleryVelvet.BLL.DTOs.User;
 using GalleryVelvet.BLL.Services.Interfaces;
+using GalleryVelvet.Presentation.Models.Cart;
 using GalleryVelvet.Presentation.Models.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace GalleryVelvet.Presentation.Controllers;
 
 [Authorize]
-public sealed class CartController(ICartItemService cartItemService) : Controller
+public sealed class CartController(
+    ICartItemService cartItemService, 
+    IUserService userService) : Controller
 {
     public async Task<IActionResult> GetCartByUserId(CancellationToken cancellationToken)
     {
@@ -16,16 +20,43 @@ public sealed class CartController(ICartItemService cartItemService) : Controlle
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
             {
-                throw new Exception( "Invalid id");
+                throw new Exception("Invalid user id");
             }
             
-            var items = await cartItemService.GetCartItemsAsync(userId, cancellationToken);
+            var cartItems = await cartItemService.GetCartItemsAsync(userId, cancellationToken);
+            
+            UserProfileDto? userProfile = null;
+            try
+            {
+                var user = await userService.GetUserProfileAsync(userId, cancellationToken);
+                if (user is not null)
+                {
+                    userProfile = new UserProfileDto
+                    {
+                        Login = user.Login,
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Email = user.Email,
+                        PhoneNumber = user.PhoneNumber
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error getting user profile: {ex.Message}");
+            }
 
-            return View(items);
+            var viewModel = new CartPageViewModel
+            {
+                CartItems = cartItems,
+                UserProfile = userProfile
+            };
+
+            return View(viewModel);
         }
         catch (Exception ex)
         {
-            return View("Error", new ErrorViewModel() { RequestId = ex.Message });
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
     }
     
@@ -40,7 +71,7 @@ public sealed class CartController(ICartItemService cartItemService) : Controlle
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
             {
-                throw new Exception( "Invalid id");
+                throw new Exception("Invalid user id");
             }
             
             await cartItemService.AddToCartAsync(
@@ -55,7 +86,7 @@ public sealed class CartController(ICartItemService cartItemService) : Controlle
         }
         catch (Exception ex)
         {
-            return View("Error", new ErrorViewModel() { RequestId = ex.Message });
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
     }
     
@@ -66,7 +97,7 @@ public sealed class CartController(ICartItemService cartItemService) : Controlle
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
             {
-                throw new Exception( "Invalid id");
+                throw new Exception("Invalid user id");
             }
             
             await cartItemService.RemoveFromCartAsync(userId, cartItemId, cancellationToken);
@@ -75,7 +106,7 @@ public sealed class CartController(ICartItemService cartItemService) : Controlle
         }
         catch (Exception ex)
         {
-            return View("Error", new ErrorViewModel() { RequestId = ex.Message });
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
     }
     
@@ -86,7 +117,7 @@ public sealed class CartController(ICartItemService cartItemService) : Controlle
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
             {
-                throw new Exception( "Invalid id");
+                throw new Exception("Invalid user id");
             }
             
             await cartItemService.ClearCartAsync(userId, cancellationToken);
@@ -95,7 +126,7 @@ public sealed class CartController(ICartItemService cartItemService) : Controlle
         }
         catch (Exception ex)
         {
-            return View("Error", new ErrorViewModel() { RequestId = ex.Message });
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
         }
     }
 }

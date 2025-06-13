@@ -1,8 +1,8 @@
-@model System.Collections.Generic.IEnumerable<GalleryVelvet.Domain.Entities.CartItemEntity>
+@model GalleryVelvet.Presentation.Models.Cart.CartPageViewModel
 
 @{
-    var totalPrice = Model.Sum(item => (item.Product.DiscountPrice ?? item.Product.Price) * item.Quantity);
-    Layout = "_Layout";
+var totalPrice = Model.CartItems.Sum(item => (item.Product.DiscountPrice ?? item.Product.Price) * item.Quantity);
+Layout = "_Layout";
 }
 
 <style>
@@ -107,7 +107,7 @@
         max-height: none;
         overflow: visible;
     }
-    
+
     .form-group {
         margin-bottom: 20px;
     }
@@ -138,6 +138,11 @@
         color: #999;
     }
 
+    .form-input.auto-filled {
+        border-color: #28a745;
+        background-color: #f8fff9;
+    }
+
     .form-select {
         width: 100%;
         padding: 12px 15px;
@@ -160,7 +165,7 @@
         resize: vertical;
         min-height: 100px;
     }
-    
+
     .phone-input-group {
         display: flex;
         gap: 10px;
@@ -174,7 +179,40 @@
     .phone-number {
         flex: 1;
     }
-    
+
+    .autofill-notice {
+        background: #e8f5e8;
+        border: 1px solid #d4edda;
+        color: #155724;
+        padding: 12px 15px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .autofill-notice i {
+        color: #28a745;
+    }
+
+    .clear-form-btn {
+        background: none;
+        border: 1px solid #ccc;
+        color: #666;
+        padding: 8px 12px;
+        font-size: 12px;
+        cursor: pointer;
+        margin-left: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .clear-form-btn:hover {
+        border-color: #999;
+        color: #333;
+    }
+
     .order-summary {
         background: #fff;
         padding: 30px;
@@ -266,7 +304,7 @@
     .remove-item:hover {
         color: #999;
     }
-    
+
     .delivery-options {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -295,7 +333,6 @@
     .delivery-option:hover {
         border-color: #666;
     }
-    
 
     @@media (max-width: 1024px) {
     .checkout-layout {
@@ -340,7 +377,7 @@
             <div class="checkout-forms">
                 <div class="form-section">
                     <div class="section-header" onclick="toggleSection(this)">
-                        <div class="section-number">5</div>
+                        <div class="section-number">1</div>
                         <div class="section-title">Тип доставки</div>
                         <div class="section-toggle">−</div>
                     </div>
@@ -355,36 +392,65 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="form-section">
                     <div class="section-header" onclick="toggleSection(this)">
-                        <div class="section-number">6</div>
+                        <div class="section-number">2</div>
                         <div class="section-title">Детали заказа</div>
                         <div class="section-toggle">−</div>
                     </div>
                     <div class="section-content active">
+                        @if (Model.UserProfile != null)
+                        {
+                        <div class="autofill-notice" id="autofillNotice">
+                            <i class="fas fa-check-circle"></i>
+                            Данные автоматически заполнены из вашего профиля
+                            <button type="button" class="clear-form-btn" onclick="clearForm()">
+                                Очистить форму
+                            </button>
+                        </div>
+                        }
+
                         <div class="form-group">
                             <div class="form-row">
-                                <input type="text" class="form-input" placeholder="Имя красивого человека *" required>
-                                <input type="text" class="form-input" placeholder="Фамилия красивого человека *" required>
+                                <input type="text"
+                                       class="form-input"
+                                       id="firstName"
+                                       placeholder="Имя *"
+                                       required>
+                                <input type="text"
+                                       class="form-input"
+                                       id="lastName"
+                                       placeholder="Фамилия *"
+                                       required>
                             </div>
                         </div>
-                            
+
                         <div class="form-group">
                             <div class="phone-input-group">
                                 <select class="form-select phone-prefix">
                                     <option value="+375">+375</option>
                                 </select>
-                                <input type="tel" class="form-input phone-number" placeholder="Телефон *" required>
+                                <input type="tel"
+                                       class="form-input phone-number"
+                                       id="phoneNumber"
+                                       placeholder="Телефон *"
+                                       required>
                             </div>
                         </div>
 
                         <div class="form-group">
-                            <input type="email" class="form-input" placeholder="Email *" required>
+                            <input type="email"
+                                   class="form-input"
+                                   id="email"
+                                   placeholder="Email *"
+                                   required>
                         </div>
 
                         <div class="form-group">
-                            <textarea class="form-textarea" placeholder="Комментарии"></textarea>
+                            <textarea class="form-textarea"
+                                      id="comments"
+                                      placeholder="Комментарии"></textarea>
                         </div>
                     </div>
                 </div>
@@ -393,48 +459,48 @@
             <div class="order-summary">
                 <div style="margin-bottom: 30px;">
                     <div style="display: flex; align-items: center; margin-bottom: 20px;">
-                        <div class="section-number">4</div>
+                        <div class="section-number">3</div>
                         <div class="section-title" style="margin-left: 15px;">Состав заказа</div>
                     </div>
 
-                    @foreach (var item in Model)
+                    @foreach (var item in Model.CartItems)
                     {
-                        var product = item.Product;
-                        var image = product.Images.FirstOrDefault()?.Image ?? "";
-                        var format = product.Images.FirstOrDefault()?.Format ?? "jpeg";
-                        
-                        var base64Src = string.IsNullOrWhiteSpace(image)
-                            ? "/images/no-image_0.jpg"
-                            : $"data:image/{format};base64,{image}";
-                        
-                        var price = product.DiscountPrice ?? product.Price;
+                    var product = item.Product;
+                    var image = product.Images.FirstOrDefault()?.Image ?? "";
+                    var format = product.Images.FirstOrDefault()?.Format ?? "jpeg";
 
-                        <div class="cart-item">
-                            <img src="@base64Src" alt="@product.Name" class="item-image"/>
+                    var base64Src = string.IsNullOrWhiteSpace(image)
+                    ? "/images/no-image_0.jpg"
+                    : $"data:image/{format};base64,{image}";
 
-                            <div class="item-details">
-                                <button class="remove-item" onclick="removeCartItem('@item.Id')">×</button>
+                    var price = product.DiscountPrice ?? product.Price;
 
-                                <div class="item-name">@product.Name</div>
-                                <div class="item-options">
-                                    Цвет: @product.Category.Name<br />
-                                    Размер: @item.Size.Label<br />
-                                    В наличии: много
-                                </div>
+                    <div class="cart-item">
+                        <img src="@base64Src" alt="@product.Name" class="item-image"/>
 
-                                <div class="item-quantity">
-                                    <button class="quantity-btn"
-                                            onclick="changeQuantity('@item.ProductId', '@item.SizeId', @item.Quantity, -1)">−</button>
+                        <div class="item-details">
+                            <button class="remove-item" onclick="removeCartItem('@item.Id')">×</button>
 
-                                    <span class="quantity-value">@item.Quantity</span>
+                            <div class="item-name">@product.Name</div>
+                            <div class="item-options">
+                                Цвет: @product.Category.Name<br />
+                                Размер: @item.Size.Label<br />
+                                В наличии: много
+                            </div>
 
-                                    <button class="quantity-btn"
-                                            onclick="changeQuantity('@item.ProductId', '@item.SizeId', @item.Quantity, 1)">+</button>
+                            <div class="item-quantity">
+                                <button class="quantity-btn"
+                                        onclick="changeQuantity('@item.ProductId', '@item.SizeId', @item.Quantity, -1)">−</button>
 
-                                    <div class="item-price">@price.ToString("N0") BYN x @item.Quantity</div>
-                                </div>
+                                <span class="quantity-value">@item.Quantity</span>
+
+                                <button class="quantity-btn"
+                                        onclick="changeQuantity('@item.ProductId', '@item.SizeId', @item.Quantity, 1)">+</button>
+
+                                <div class="item-price">@price.ToString("N0") BYN x @item.Quantity</div>
                             </div>
                         </div>
+                    </div>
                     }
                 </div>
 
@@ -452,13 +518,151 @@
 </main>
 
 <script>
+    // Данные профиля пользователя для автозаполнения
+    const userProfile = @Html.Raw(Json.Serialize(Model.UserProfile));
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Автозаполнение формы данными из профиля
+        if (userProfile) {
+            fillFormWithProfile();
+        }
+
+        // Обработка форматирования телефона
+        setupPhoneFormatting();
+
+        // Валидация формы
+        setupFormValidation();
+    });
+
+    function fillFormWithProfile() {
+        const fields = {
+            'firstName': userProfile.firstName || '',
+            'lastName': userProfile.lastName || '',
+            'email': userProfile.email || '',
+            'phoneNumber': formatPhoneNumber(userProfile.phoneNumber || '')
+        };
+
+        Object.entries(fields).forEach(([fieldId, value]) => {
+            const field = document.getElementById(fieldId);
+            if (field && value) {
+                field.value = value;
+                field.classList.add('auto-filled');
+
+                // Анимация заполнения
+                field.style.opacity = '0.5';
+                setTimeout(() => {
+                    field.style.opacity = '1';
+                    field.style.transition = 'opacity 0.3s ease';
+                }, 100);
+            }
+        });
+
+        console.log('Форма автоматически заполнена данными профиля');
+    }
+
+    function formatPhoneNumber(phone) {
+        if (!phone) return '';
+
+        // Удаляем все нецифровые символы
+        let digits = phone.replace(/\D/g, '');
+
+        // Если номер начинается с 375, удаляем префикс
+        if (digits.startsWith('375')) {
+            digits = digits.slice(3);
+        }
+
+        // Форматируем для отображения
+        if (digits.length >= 2) {
+            return `(${digits.slice(0, 2)}) ${digits.slice(2, 5)}-${digits.slice(5, 7)}-${digits.slice(7, 9)}`;
+        }
+
+        return digits;
+    }
+
+    function clearForm() {
+        const fields = ['firstName', 'lastName', 'email', 'phoneNumber', 'comments'];
+
+        fields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.value = '';
+                field.classList.remove('auto-filled');
+                field.style.borderColor = '#e5e5e5';
+                field.style.backgroundColor = '#fff';
+            }
+        });
+
+        // Скрываем уведомление об автозаполнении
+        const notice = document.getElementById('autofillNotice');
+        if (notice) {
+            notice.style.display = 'none';
+        }
+
+        console.log('Форма очищена');
+    }
+
+    function setupPhoneFormatting() {
+        const phoneField = document.querySelector('.phone-number');
+        if (phoneField) {
+            phoneField.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+
+                if (value.length >= 2) {
+                    value = `(${value.slice(0, 2)}) ${value.slice(2, 5)}-${value.slice(5, 7)}-${value.slice(7, 9)}`;
+                }
+
+                e.target.value = value;
+
+                // Убираем класс автозаполнения при ручном вводе
+                if (e.target.classList.contains('auto-filled')) {
+                    e.target.classList.remove('auto-filled');
+                    e.target.style.backgroundColor = '#fff';
+                }
+            });
+        }
+    }
+
+    function setupFormValidation() {
+        const fields = document.querySelectorAll('input, select, textarea');
+
+        fields.forEach(field => {
+            field.addEventListener('input', function() {
+                if (this.hasAttribute('required') && this.value.trim()) {
+                    this.style.borderColor = '#28a745';
+                } else if (this.hasAttribute('required')) {
+                    this.style.borderColor = '#e5e5e5';
+                }
+
+                // Убираем класс автозаполнения при ручном изменении
+                if (this.classList.contains('auto-filled') &&
+                    this.dataset.originalValue !== this.value) {
+                    this.classList.remove('auto-filled');
+                    this.style.backgroundColor = '#fff';
+                }
+            });
+
+            field.addEventListener('blur', function() {
+                if (this.hasAttribute('required') && !this.value.trim()) {
+                    this.style.borderColor = '#ff4444';
+                } else if (this.value.trim()) {
+                    this.style.borderColor = '#e5e5e5';
+                }
+            });
+
+            // Сохраняем изначальное значение для сравнения
+            if (field.classList.contains('auto-filled')) {
+                field.dataset.originalValue = field.value;
+            }
+        });
+    }
+
     function changeQuantity(productId, sizeId, currentQuantity, delta) {
         const newQuantity = currentQuantity + delta;
         if (newQuantity < 1) return;
 
         window.location.href = `/Cart/AddToCart?productId=${productId}&sizeId=${sizeId}&quantity=${delta}`;
     }
-    
+
     function toggleSection(header) {
         const content = header.nextElementSibling;
         const toggle = header.querySelector('.section-toggle');
@@ -476,7 +680,7 @@
             toggle.classList.add('open');
         }
     }
-    
+
     function selectDelivery(element, type) {
         document.querySelectorAll('.delivery-option').forEach(opt => {
             opt.classList.remove('active');
@@ -494,7 +698,7 @@
     function validateForm() {
         const requiredFields = document.querySelectorAll('input[required], select[required]');
         let isValid = true;
-        
+
         requiredFields.forEach(field => {
             if (!field.value.trim()) {
                 field.style.borderColor = '#ff4444';
@@ -503,37 +707,7 @@
                 field.style.borderColor = '#e5e5e5';
             }
         });
-        
+
         return isValid;
     }
-    
-    document.querySelectorAll('input, select, textarea').forEach(field => {
-        field.addEventListener('input', function() {
-            if (this.hasAttribute('required') && this.value.trim()) {
-                this.style.borderColor = '#4CAF50';
-            }
-        });
-        
-        field.addEventListener('blur', function() {
-            if (this.hasAttribute('required') && !this.value.trim()) {
-                this.style.borderColor = '#ff4444';
-            } else if (this.value.trim()) {
-                this.style.borderColor = '#e5e5e5';
-            }
-        });
-    });
-    
-    document.querySelector('.phone-number').addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, '');
-        
-        const prefix = document.querySelector('.phone-prefix').value;
-        
-        if (prefix === '+375') {
-            if (value.length >= 2) {
-                value = `(${value.slice(0, 2)}) ${value.slice(2, 5)}-${value.slice(5, 7)}-${value.slice(7, 9)}`;
-            }
-        }
-        
-        e.target.value = value;
-    });
 </script>

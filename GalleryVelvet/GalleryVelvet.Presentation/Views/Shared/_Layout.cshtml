@@ -15,7 +15,7 @@
             --sidebar-width-expanded: 280px;
             --sidebar-width-collapsed: 0px;
             --header-height: 70px;
-            
+
             --background-color-body: #F4F6F8;
             --background-color-surface: #FFFFFF;
             --text-color-primary: #212529;
@@ -25,6 +25,7 @@
             --border-color: #DEE2E6;
             --hover-background-color: #E9ECEF;
             --sales-color: #FF0000;
+            --logout-color: #dc3545;
         }
 
         body {
@@ -263,7 +264,7 @@
             transition: left 0.3s ease-in-out;
         }
         .sidebar-toggle-btn:hover { color: var(--accent-color); }
-        
+
         .page-wrapper.sidebar-expanded .sidebar-toggle-btn {
             left: calc(-1 * var(--sidebar-width-expanded));
         }
@@ -303,12 +304,48 @@
             position: absolute; left: 50%; transform: translateX(-50%);
         }
 
-        .header-right-icons a {
-            color: var(--text-color-primary); margin-left: 20px;
-            font-size: 1.2em; text-decoration: none;
+        .header-right-icons {
+            display: flex;
+            align-items: center;
         }
-        .header-right-icons a:hover { color: var(--accent-color); }
-        
+
+        .header-right-icons a {
+            color: var(--text-color-primary);
+            margin-left: 20px;
+            font-size: 1.2em;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .header-right-icons a:hover {
+            color: var(--accent-color);
+        }
+
+        .header-right-icons a.logout-btn {
+            color: var(--logout-color);
+            font-size: 1.1em;
+        }
+
+        .header-right-icons a.logout-btn:hover {
+            color: #c82333;
+        }
+
+        .header-right-icons a[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: #fff;
+            padding: 4px 8px;
+            font-size: 10px;
+            white-space: nowrap;
+            border-radius: 2px;
+            z-index: 1000;
+        }
+
         .top-megamenu-panel {
             position: fixed;
             top: var(--header-height);
@@ -326,7 +363,7 @@
             transition: opacity 0.25s ease-out, transform 0.25s ease-out, visibility 0.25s linear, left 0.3s ease-in-out, width 0.3s ease-in-out;
             visibility: hidden;
         }
-        
+
         .page-wrapper.sidebar-expanded .top-megamenu-panel.megamenu-visible {
             left: var(--sidebar-width-expanded);
             width: calc(100% - var(--sidebar-width-expanded));
@@ -410,7 +447,7 @@
             color: var(--sales-color);
             text-transform: uppercase;
         }
-        
+
         .main-content {
             flex-grow: 1;
             padding: 20px;
@@ -418,7 +455,7 @@
             margin-top: var(--header-height);
             width: 100%;
         }
-        
+
         .site-footer {
             background-color: var(--background-color-surface);
             border-top: 1px solid var(--border-color);
@@ -435,22 +472,36 @@
             width: calc(100% - var(--sidebar-width-expanded));
             margin-left: var(--sidebar-width-expanded);
         }
-        
+
         @@media (max-width: 768px) {
-            :root {
-                --sidebar-width-expanded: 250px;
-            }
-            .header-logo { font-size: 1.5em; }
-            .header-nav-links { display: none; }
-
-            .top-megamenu-panel {
-                display: none !important;
-            }
-
-            .language-currency-selector { flex-direction: column; align-items: stretch; }
-            .language-currency-selector span, .language-currency-selector select { margin-bottom: 10px; margin-right: 0; }
-            .language-currency-selector span:last-child, .language-currency-selector select:last-child { margin-bottom: 0; }
+        :root {
+            --sidebar-width-expanded: 250px;
         }
+        .header-logo { font-size: 1.5em; }
+        .header-nav-links { display: none; }
+
+        .top-megamenu-panel {
+            display: none !important;
+        }
+
+        .language-currency-selector { flex-direction: column; align-items: stretch; }
+        .language-currency-selector span, .language-currency-selector select { margin-bottom: 10px; margin-right: 0; }
+        .language-currency-selector span:last-child, .language-currency-selector select:last-child { margin-bottom: 0; }
+
+        .header-right-icons a[title]:hover::after {
+            display: none;
+        }
+
+        .header-right-icons {
+            gap: 15px;
+        }
+
+        .header-right-icons a {
+            margin-left: 15px;
+            font-size: 1.1em;
+        }
+        }
+
     </style>
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -517,6 +568,7 @@
             </div>
         </div>
     </div>
+
     <header class="site-header">
         <div class="header-left">
             <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Toggle Menu">
@@ -528,9 +580,25 @@
         </div>
         <a href="/" class="header-logo">GalleryVelvet</a>
         <div class="header-right-icons">
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+            <a asp-controller="User" asp-action="Index" aria-label="Profile" title="Личный кабинет">
+                <i class="fas fa-user"></i>
+            </a>
+            <a asp-controller="Account" asp-action="Logout" class="logout-btn" aria-label="Logout" title="Выйти из аккаунта">
+                <i class="fas fa-sign-out-alt"></i>
+            </a>
+            }
+            else
+            {
+            <a asp-controller="Account" asp-action="Login" aria-label="Login" title="Войти">
+                <i class="fas fa-user"></i>
+            </a>
+            }
             <a asp-controller="Cart"
                asp-action="GetCartByUserId"
-               aria-label="Cart">
+               aria-label="Cart"
+               title="Корзина">
                 <i class="fas fa-shopping-bag"></i>
             </a>
         </div>
@@ -551,14 +619,14 @@
             sidebarToggleBtn.addEventListener('click', function () {
                 sidebar.classList.toggle('expanded');
                 pageWrapper.classList.toggle('sidebar-expanded');
-                
+
                 if (sidebar.classList.contains('expanded')) {
                     localStorage.setItem('sidebarState_znwr', 'expanded');
                 } else {
                     localStorage.setItem('sidebarState_znwr', 'collapsed');
                 }
             });
-            
+
             const currentSidebarState = localStorage.getItem('sidebarState_znwr');
             if (currentSidebarState === 'expanded') {
                 sidebar.classList.add('expanded');
@@ -579,7 +647,7 @@
                 }
             });
         });
-        
+
         const womanMenuToggle = document.getElementById('womanMenuToggle');
         const womanMegaMenu = document.getElementById('womanMegaMenu');
 
@@ -588,11 +656,11 @@
                 e.preventDefault();
 
                 const isVisible = womanMegaMenu.classList.contains('megamenu-visible');
-                
+
                 womanMegaMenu.classList.toggle('megamenu-visible');
                 this.classList.toggle('active-megamenu', !isVisible);
             });
-            
+
             document.addEventListener('click', function (e) {
                 if (womanMegaMenu.classList.contains('megamenu-visible') &&
                     !womanMegaMenu.contains(e.target) &&
