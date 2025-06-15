@@ -1,0 +1,660 @@
+@model GalleryVelvet.Presentation.Models.Admin.TagsAdminViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Управление тегами";
+}
+
+<style>
+    .admin-page {
+        padding: 30px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+        min-height: calc(100vh - 70px);
+        background: #f8f9fa;
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        background: white;
+        padding: 25px 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .admin-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .admin-breadcrumb {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    .admin-breadcrumb a {
+        color: #3498db;
+        text-decoration: none;
+    }
+
+    .admin-breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 15px;
+    }
+
+    .create-btn {
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .create-btn:hover {
+        background: linear-gradient(135deg, #8e44ad, #9b59b6);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+    }
+
+    .admin-filters {
+        background: white;
+        padding: 25px 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    .filters-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 20px;
+        align-items: end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filter-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .filter-input {
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .filter-input:focus {
+        outline: none;
+        border-color: #9b59b6;
+        box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.1);
+    }
+
+    .filter-btn {
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-btn:hover {
+        background: linear-gradient(135deg, #2980b9, #3498db);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .tags-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .tag-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        position: relative;
+    }
+
+    .tag-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        border-color: #9b59b6;
+    }
+
+    .tag-header {
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        color: white;
+        padding: 20px 25px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .tag-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @@keyframes float {
+        0%, 100% { transform: translate(0, 0) scale(1); }
+        50% { transform: translate(-10px, -10px) scale(1.1); }
+    }
+
+    .tag-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-bottom: 15px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .tag-name {
+        font-size: 18px;
+        font-weight: 700;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .tag-name::before {
+        content: '#';
+        font-size: 16px;
+        opacity: 0.7;
+    }
+
+    .tag-body {
+        padding: 25px;
+    }
+
+    .tag-description {
+        color: #6c757d;
+        line-height: 1.6;
+        margin-bottom: 20px;
+        font-size: 14px;
+        min-height: 40px;
+    }
+
+    .tag-description.empty {
+        font-style: italic;
+        opacity: 0.7;
+    }
+
+    .tag-stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+        background: #e9ecef;
+        transform: scale(1.05);
+    }
+
+    .stat-number {
+        font-size: 20px;
+        font-weight: 700;
+        color: #9b59b6;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 11px;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .tag-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .action-btn-edit {
+        background: #f39c12;
+        color: white;
+    }
+
+    .action-btn-edit:hover {
+        background: #e67e22;
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+    }
+
+    .action-btn-delete {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .action-btn-delete:hover {
+        background: #c0392b;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 30px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        grid-column: 1 / -1;
+    }
+
+    .empty-state-icon {
+        font-size: 64px;
+        margin-bottom: 25px;
+        opacity: 0.5;
+    }
+
+    .empty-state-text {
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .empty-state-subtext {
+        font-size: 16px;
+        opacity: 0.7;
+        color: #6c757d;
+        margin-bottom: 30px;
+    }
+
+    .pagination {
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .pagination-link {
+        padding: 10px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        color: #9b59b6;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .pagination-link:hover {
+        background: #9b59b6;
+        color: white;
+        text-decoration: none;
+        border-color: #9b59b6;
+    }
+
+    .pagination-link.active {
+        background: #9b59b6;
+        color: white;
+        border-color: #9b59b6;
+    }
+
+    .pagination-link.disabled {
+        color: #6c757d;
+        background: #f8f9fa;
+        cursor: not-allowed;
+        border-color: #e9ecef;
+    }
+
+    .alert {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    .tag-usage-indicator {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: rgba(255, 255, 255, 0.9);
+        color: #9b59b6;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    @@media (max-width: 768px) {
+        .admin-page {
+            padding: 20px 15px;
+        }
+
+        .admin-header {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+
+        .header-actions {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .filters-row {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .tags-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .tag-stats {
+            grid-template-columns: 1fr;
+        }
+
+        .tag-actions {
+            flex-direction: column;
+        }
+    }
+
+    .fade-in {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<main class="admin-page">
+    <div class="admin-header fade-in">
+        <div>
+            <h1 class="admin-title">Управление тегами</h1>
+            <div class="admin-breadcrumb">
+                <a href="@Url.Action("Index", "Admin")">Главная</a> / Теги
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="@Url.Action("CreateTag", "Admin")" class="create-btn">
+                🏷️ Создать тег
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success fade-in">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger fade-in">
+            @TempData["Error"]
+        </div>
+    }
+
+    <form method="get" class="admin-filters fade-in">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label class="filter-label">Поиск тегов</label>
+                <input type="text" name="searchTerm" value="@Model.SearchTerm" 
+                       class="filter-input" placeholder="Введите название тега...">
+            </div>
+
+            <div class="filter-group">
+                <button type="submit" class="filter-btn">
+                    🔍 Поиск
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="tags-grid">
+        @if (Model.Tags.Any())
+        {
+            @foreach (var tag in Model.Tags)
+            {
+                <div class="tag-card fade-in" style="animation-delay: @(Model.Tags.ToList().IndexOf(tag) * 0.1)s;">
+                    <div class="tag-usage-indicator">
+                        Популярный
+                    </div>
+                    
+                    <div class="tag-header">
+                        <div class="tag-icon">
+                            🏷️
+                        </div>
+                        <h3 class="tag-name">@tag.Name</h3>
+                    </div>
+                    
+                    <div class="tag-body">
+                        <div class="tag-actions">
+                            <a href="@Url.Action("EditTag", "Admin", new { id = tag.Id })" 
+                               class="action-btn action-btn-edit">
+                                ✏️ Редактировать
+                            </a>
+                            
+                            <form asp-action="DeleteTag" asp-route-id="@tag.Id" method="post" 
+                                  style="flex: 1;" onsubmit="return confirmDelete('@tag.Name')">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="action-btn action-btn-delete" style="width: 100%;">
+                                    🗑️ Удалить
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon">🏷️</div>
+                <div class="empty-state-text">Теги не найдены</div>
+                <div class="empty-state-subtext">
+                    @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+                    {
+                        <text>По запросу "@Model.SearchTerm" ничего не найдено. Попробуйте изменить поисковый запрос.</text>
+                    }
+                    else
+                    {
+                        <text>В системе пока нет тегов. Создайте первый тег для классификации товаров.</text>
+                    }
+                </div>
+                
+                @if (string.IsNullOrWhiteSpace(Model.SearchTerm))
+                {
+                    <a href="@Url.Action("CreateTag", "Admin")" class="create-btn">
+                        🏷️ Создать первый тег
+                    </a>
+                }
+            </div>
+        }
+    </div>
+
+    @if (Model.Tags.MetaData.TotalPages > 1)
+    {
+        <div class="pagination">
+            @if (Model.Tags.MetaData.HasPrevious)
+            {
+                <a href="@Url.Action("Tags", "Admin", new { 
+                    pageNumber = Model.Tags.MetaData.CurrentPage - 1,
+                    searchTerm = Model.SearchTerm
+                })" class="pagination-link">← Назад</a>
+            }
+            else
+            {
+                <span class="pagination-link disabled">← Назад</span>
+            }
+
+            @for (int i = Math.Max(1, Model.Tags.MetaData.CurrentPage - 2); 
+                  i <= Math.Min(Model.Tags.MetaData.TotalPages, Model.Tags.MetaData.CurrentPage + 2); 
+                  i++)
+            {
+                if (i == Model.Tags.MetaData.CurrentPage)
+                {
+                    <span class="pagination-link active">@i</span>
+                }
+                else
+                {
+                    <a href="@Url.Action("Tags", "Admin", new { 
+                        pageNumber = i,
+                        searchTerm = Model.SearchTerm
+                    })" class="pagination-link">@i</a>
+                }
+            }
+
+            @if (Model.Tags.MetaData.HasNext)
+            {
+                <a href="@Url.Action("Tags", "Admin", new { 
+                    pageNumber = Model.Tags.MetaData.CurrentPage + 1,
+                    searchTerm = Model.SearchTerm
+                })" class="pagination-link">Вперед →</a>
+            }
+            else
+            {
+                <span class="pagination-link disabled">Вперед →</span>
+            }
+        </div>
+    }
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('input[name="searchTerm"]');
+        let searchTimeout;
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    this.form.submit();
+                }, 500);
+            });
+        }
+        
+        const tagCards = document.querySelectorAll('.tag-card');
+        tagCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+        
+        const usageIndicators = document.querySelectorAll('.tag-usage-indicator');
+        const colors = ['#e74c3c', '#f39c12', '#27ae60', '#3498db', '#9b59b6'];
+        const labels = ['Новый', 'Популярный', 'Трендовый', 'Активный', 'Топ'];
+        
+        usageIndicators.forEach((indicator, index) => {
+            const colorIndex = index % colors.length;
+            indicator.style.backgroundColor = colors[colorIndex];
+            indicator.style.color = 'white';
+            indicator.textContent = labels[colorIndex];
+        });
+
+        console.log('Страница управления тегами загружена');
+    });
+
+    function confirmDelete(tagName) {
+        return confirm(`Вы уверены, что хотите удалить тег "${tagName}"?\n\nТег будет удален из всех товаров. Это действие нельзя отменить.`);
+    }
+</script>

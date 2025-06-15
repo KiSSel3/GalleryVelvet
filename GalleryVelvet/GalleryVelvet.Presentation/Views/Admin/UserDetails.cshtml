@@ -1,0 +1,607 @@
+@model GalleryVelvet.Presentation.Models.Admin.UserDetailsAdminViewModel
+
+@{
+Layout = "_Layout";
+ViewData["Title"] = "Детали пользователя";
+}
+
+<style>
+    .admin-page {
+        padding: 30px 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+        min-height: calc(100vh - 70px);
+        background: #f8f9fa;
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        background: white;
+        padding: 25px 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .admin-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .admin-breadcrumb {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    .admin-breadcrumb a {
+        color: #3498db;
+        text-decoration: none;
+    }
+
+    .admin-breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+    .user-layout {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+    }
+
+    .user-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #34495e, #2c3e50);
+        color: white;
+        padding: 20px 25px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .card-body {
+        padding: 25px;
+    }
+
+    .user-avatar-section {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    .user-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 700;
+        font-size: 48px;
+        margin: 0 auto 15px;
+        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+    }
+
+    .user-name {
+        font-size: 24px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+
+    .user-login {
+        font-size: 16px;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .user-info-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .info-item {
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #3498db;
+    }
+
+    .info-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 5px;
+    }
+
+    .info-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .info-value.empty {
+        color: #6c757d;
+        font-style: italic;
+        font-weight: 400;
+    }
+
+    .roles-section {
+        background: #e8f5e8;
+        border: 2px solid #c3e6cb;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 25px;
+    }
+
+    .roles-title {
+        color: #155724;
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
+
+    .current-roles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .role-badge {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .role-admin {
+        background: #f8d7da;
+        color: #721c24;
+        border: 2px solid #f5c6cb;
+    }
+
+    .role-manager {
+        background: #fff3cd;
+        color: #856404;
+        border: 2px solid #ffeaa7;
+    }
+
+    .role-user {
+        background: #d4edda;
+        color: #155724;
+        border: 2px solid #c3e6cb;
+    }
+
+    .roles-form {
+        background: #fff3cd;
+        border: 2px solid #ffeaa7;
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    .roles-form-title {
+        color: #856404;
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
+
+    .roles-checkboxes {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 20px;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        background: white;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .checkbox-item:hover {
+        background: #f8f9fa;
+        border-color: #3498db;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+
+    .checkbox-label {
+        font-weight: 500;
+        color: #2c3e50;
+        cursor: pointer;
+        flex: 1;
+    }
+
+    .role-description {
+        font-size: 12px;
+        color: #6c757d;
+        font-style: italic;
+    }
+
+    .update-roles-btn {
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+    }
+
+    .update-roles-btn:hover {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+    }
+
+    .update-roles-btn:disabled {
+        background: #95a5a6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .back-btn {
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);
+    }
+
+    .alert {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    .user-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 15px;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+
+    .stat-number {
+        font-size: 24px;
+        font-weight: 700;
+        color: #2c3e50;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    @@media (max-width: 768px) {
+    .admin-page {
+        padding: 20px 15px;
+    }
+
+    .user-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .admin-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .user-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .roles-checkboxes {
+        gap: 8px;
+    }
+    }
+</style>
+
+<main class="admin-page">
+    <div class="admin-header">
+        <div>
+            <h1 class="admin-title">Детали пользователя</h1>
+            <div class="admin-breadcrumb">
+                <a href="@Url.Action("Index", "Admin")">Главная</a> /
+                <a href="@Url.Action("Users", "Admin")">Пользователи</a> /
+                Детали
+            </div>
+        </div>
+        <div>
+            <a href="@Url.Action("Users", "Admin")" class="back-btn">
+                ← Назад к списку
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+    }
+
+    <div class="user-layout">
+        <div class="user-card">
+            <div class="card-header">
+                👤 Информация о пользователе
+            </div>
+            <div class="card-body">
+                <div class="user-avatar-section">
+                    <div class="user-avatar">
+                        @{
+                        var initials = "";
+                        if (!string.IsNullOrWhiteSpace(Model.User.FirstName) && !string.IsNullOrWhiteSpace(Model.User.LastName))
+                        {
+                        initials = $"{Model.User.FirstName.First()}{Model.User.LastName.First()}";
+                        }
+                        else if (!string.IsNullOrWhiteSpace(Model.User.FirstName))
+                        {
+                        initials = Model.User.FirstName.First().ToString();
+                        }
+                        else
+                        {
+                        initials = Model.User.Login.First().ToString();
+                        }
+                        }
+                        @initials.ToUpper()
+                    </div>
+                    <div class="user-name">
+                        @if (!string.IsNullOrWhiteSpace(Model.User.FirstName) || !string.IsNullOrWhiteSpace(Model.User.LastName))
+                        {
+                        <text>@Model.User.FirstName @Model.User.LastName</text>
+                        }
+                        else
+                        {
+                        <text>@Model.User.Login</text>
+                        }
+                    </div>
+                    <div class="user-login">@@@Model.User.Login</div>
+                </div>
+
+                <div class="user-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">2</span>
+                        <span class="stat-label">Заказы</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">5</span>
+                        <span class="stat-label">Товары</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number">₽0</span>
+                        <span class="stat-label">Потрачено</span>
+                    </div>
+                </div>
+
+                <div class="user-info-grid">
+                    <div class="info-item">
+                        <div class="info-label">Email</div>
+                        <div class="info-value @(string.IsNullOrWhiteSpace(Model.User.Email) ? "empty" : "")">
+                            @(string.IsNullOrWhiteSpace(Model.User.Email) ? "Не указан" : Model.User.Email)
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Телефон</div>
+                        <div class="info-value @(string.IsNullOrWhiteSpace(Model.User.PhoneNumber) ? "empty" : "")">
+                            @(string.IsNullOrWhiteSpace(Model.User.PhoneNumber) ? "Не указан" : Model.User.PhoneNumber)
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">ID пользователя</div>
+                        <div class="info-value" style="font-family: monospace; font-size: 14px;">
+                            @Model.User.Id
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="user-card">
+            <div class="card-header">
+                🔐 Управление ролями
+            </div>
+            <div class="card-body">
+                <div class="roles-section">
+                    <div class="roles-title">Текущие роли пользователя:</div>
+                    <div class="current-roles">
+                        @foreach (var userRole in Model.User.UserRoles)
+                        {
+                        <span class="role-badge role-@userRole.Role.Name.ToLower()">
+                                🛡️ @userRole.Role.Name
+                            </span>
+                        }
+                        @if (!Model.User.UserRoles.Any())
+                        {
+                        <span style="color: #6c757d; font-style: italic;">Роли не назначены</span>
+                        }
+                    </div>
+                </div>
+
+                <form asp-action="UpdateUserRoles" asp-route-id="@Model.User.Id" method="post" class="roles-form">
+                    @Html.AntiForgeryToken()
+
+                    <div class="roles-form-title">⚙️ Изменить роли пользователя:</div>
+
+                    <div class="roles-checkboxes">
+                        @foreach (var role in Model.AllRoles)
+                        {
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="RoleIds" value="@role.Id"
+                                   @(Model.SelectedRoleIds.Contains(role.Id) ? "checked" : "") />
+                            <div class="checkbox-label">
+                                <div>@role.Name</div>
+                                <div class="role-description">
+                                    @switch (role.Name.ToLower())
+                                    {
+                                    case "admin":
+                                    <text>Полный доступ к системе</text>
+                                    break;
+                                    case "manager":
+                                    <text>Управление заказами и товарами</text>
+                                    break;
+                                    case "user":
+                                    <text>Обычный пользователь</text>
+                                    break;
+                                    default:
+                                    <text>Пользовательская роль</text>
+                                    break;
+                                    }
+                                </div>
+                            </div>
+                        </label>
+                        }
+                    </div>
+
+                    <button type="submit" class="update-roles-btn" id="updateRolesBtn">
+                        💾 Обновить роли
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.user-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 200);
+        });
+        
+        const checkboxes = document.querySelectorAll('input[name="RoleIds"]');
+        const updateBtn = document.getElementById('updateRolesBtn');
+        const originalRoles = @Html.Raw(Json.Serialize(Model.SelectedRoleIds));
+
+        function updateButtonState() {
+            const currentRoles = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            const hasChanges = JSON.stringify(currentRoles.sort()) !== JSON.stringify(originalRoles.sort());
+
+            if (hasChanges) {
+                updateBtn.disabled = false;
+                updateBtn.textContent = '💾 Обновить роли';
+                updateBtn.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+            } else {
+                updateBtn.disabled = true;
+                updateBtn.textContent = '✓ Роли не изменены';
+                updateBtn.style.background = '#95a5a6';
+            }
+        }
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateButtonState);
+        });
+        
+        updateButtonState();
+        
+        const rolesForm = document.querySelector('.roles-form');
+        if (rolesForm) {
+            rolesForm.addEventListener('submit', function(e) {
+                const selectedRoles = Array.from(checkboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => cb.parentElement.querySelector('.checkbox-label > div').textContent);
+
+                const message = selectedRoles.length > 0
+                    ? `Назначить роли: ${selectedRoles.join(', ')}?`
+                    : 'Убрать все роли у пользователя?';
+
+                const confirmed = confirm(message);
+                if (!confirmed) {
+                    e.preventDefault();
+                }
+            });
+        }
+
+        console.log('Страница деталей пользователя загружена');
+    });
+</script>

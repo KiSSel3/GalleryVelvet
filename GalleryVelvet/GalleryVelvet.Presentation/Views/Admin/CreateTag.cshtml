@@ -1,0 +1,544 @@
+@model GalleryVelvet.BLL.DTOs.Admin.CreateTagDto
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Создание тега";
+}
+
+<style>
+    .admin-page {
+        padding: 30px 20px;
+        max-width: 800px;
+        margin: 0 auto;
+        min-height: calc(100vh - 70px);
+        background: #f8f9fa;
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        background: white;
+        padding: 25px 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .admin-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .admin-breadcrumb {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    .admin-breadcrumb a {
+        color: #3498db;
+        text-decoration: none;
+    }
+
+    .admin-breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+    .back-btn {
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        color: white;
+        padding: 25px 30px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%), 
+                    linear-gradient(-45deg, rgba(255,255,255,0.1) 25%, transparent 25%), 
+                    linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.1) 75%), 
+                    linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.1) 75%);
+        background-size: 20px 20px;
+        background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        animation: move 20s linear infinite;
+        opacity: 0.3;
+    }
+
+    @@keyframes move {
+        0% { background-position: 0 0, 0 10px, 10px -10px, -10px 0px; }
+        100% { background-position: 20px 20px, 20px 30px, 30px 10px, 10px 20px; }
+    }
+
+    .form-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        margin: 0 auto 20px;
+        position: relative;
+        z-index: 1;
+        animation: pulse 2s infinite;
+    }
+
+    @@keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    .form-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-subtitle {
+        font-size: 16px;
+        opacity: 0.9;
+        margin: 10px 0 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-body {
+        padding: 40px 30px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        background: #fff;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #9b59b6;
+        box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.1);
+        background: #faf9fc;
+    }
+
+    .form-input.error {
+        border-color: #e74c3c;
+        background: #fff5f5;
+    }
+
+    .form-textarea {
+        min-height: 100px;
+        resize: vertical;
+        font-family: inherit;
+        line-height: 1.5;
+    }
+
+    .form-help {
+        font-size: 13px;
+        color: #6c757d;
+        margin-top: 5px;
+        font-style: italic;
+    }
+
+    .error-message {
+        color: #e74c3c;
+        font-size: 13px;
+        margin-top: 5px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .error-message::before {
+        content: '⚠️';
+        font-size: 12px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        padding-top: 20px;
+        border-top: 2px solid #f8f9fa;
+    }
+
+    .btn {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        color: white;
+        border: 2px solid transparent;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #8e44ad, #9b59b6);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(155, 89, 182, 0.3);
+    }
+
+    .btn-primary:disabled {
+        background: #95a5a6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: #6c757d;
+        border: 2px solid #dee2e6;
+    }
+
+    .btn-secondary:hover {
+        background: #f8f9fa;
+        color: #2c3e50;
+        border-color: #6c757d;
+        text-decoration: none;
+    }
+
+    .alert {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    .preview-section {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .preview-title {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 14px;
+    }
+
+    .preview-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #9b59b6, #8e44ad);
+        color: white;
+        padding: 10px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 14px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 15px rgba(155, 89, 182, 0.3);
+    }
+
+    .preview-tag::before {
+        content: '#';
+        font-size: 12px;
+        opacity: 0.8;
+    }
+
+    .character-counter {
+        text-align: right;
+        font-size: 12px;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+
+    .character-counter.warning {
+        color: #f39c12;
+    }
+
+    .character-counter.danger {
+        color: #e74c3c;
+    }
+
+    @@media (max-width: 768px) {
+        .admin-page {
+            padding: 20px 15px;
+        }
+
+        .admin-header {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+
+        .form-body {
+            padding: 30px 20px;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    .fade-in {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<main class="admin-page">
+    <div class="admin-header fade-in">
+        <div>
+            <h1 class="admin-title">Создание тега</h1>
+            <div class="admin-breadcrumb">
+                <a href="@Url.Action("Index", "Admin")">Главная</a> / 
+                <a href="@Url.Action("Tags", "Admin")">Теги</a> / 
+                Создание
+            </div>
+        </div>
+        <div>
+            <a href="@Url.Action("Tags", "Admin")" class="back-btn">
+                ← Назад к списку
+            </a>
+        </div>
+    </div>
+
+    @if (ViewData.ModelState.Where(x => string.IsNullOrEmpty(x.Key)).Any(x => x.Value?.Errors.Count > 0))
+    {
+        <div class="alert alert-danger fade-in">
+            <strong>Ошибка:</strong>
+            @foreach (var error in ViewData.ModelState.Where(x => string.IsNullOrEmpty(x.Key)).SelectMany(x => x.Value?.Errors ?? []))
+            {
+                <div>@error.ErrorMessage</div>
+            }
+        </div>
+    }
+
+    <form asp-action="CreateTag" method="post" class="form-card fade-in" style="animation-delay: 0.2s;">
+        @Html.AntiForgeryToken()
+        
+        <div class="form-header">
+            <div class="form-icon">🏷️</div>
+            <h2 class="form-title">Новый тег</h2>
+            <p class="form-subtitle">Создайте новый тег для классификации товаров</p>
+        </div>
+
+        <div class="form-body">
+            <div class="form-group">
+                <label asp-for="Name" class="form-label">Название тега *</label>
+                <input asp-for="Name" 
+                       class="form-input @(ViewData.ModelState["Name"]?.Errors.Count > 0 ? "error" : "")"
+                       placeholder="Введите название тега..."
+                       maxlength="50"
+                       required />
+                <div class="form-help">Название должно быть коротким и описательным</div>
+                <div class="character-counter" id="nameCounter">0 / 50</div>
+                <span asp-validation-for="Name" class="error-message"></span>
+            </div>
+
+            <div class="preview-section">
+                <div class="preview-title">Предварительный просмотр</div>
+                <div class="preview-tag" id="previewTag">
+                    Название тега
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="@Url.Action("Tags", "Admin")" class="btn btn-secondary">
+                    ❌ Отмена
+                </a>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    🏷️ Создать тег
+                </button>
+            </div>
+        </div>
+    </form>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const nameInput = document.querySelector('input[name="Name"]');
+        const previewTag = document.getElementById('previewTag');
+        const submitBtn = document.getElementById('submitBtn');
+        const nameCounter = document.getElementById('nameCounter');
+        const form = document.querySelector('form');
+        
+        function updatePreview() {
+            const name = nameInput.value.trim();
+
+            previewTag.textContent = name || 'Название тега';
+            
+            if (name.length >= 1) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🏷️ Создать тег';
+            } else {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⚠️ Введите название';
+            }
+        }
+        
+        function updateCounters() {
+            const nameLength = nameInput.value.length;
+            
+            nameCounter.textContent = `${nameLength} / 50`;
+            if (nameLength > 40) {
+                nameCounter.className = 'character-counter warning';
+            } else if (nameLength > 45) {
+                nameCounter.className = 'character-counter danger';
+            } else {
+                nameCounter.className = 'character-counter';
+            }
+        }
+        
+        nameInput.addEventListener('input', function() {
+            updatePreview();
+            updateCounters();
+        });
+        
+        updatePreview();
+        updateCounters();
+        
+        form.addEventListener('submit', function(e) {
+            const name = nameInput.value.trim();
+            
+            if (name.length < 1) {
+                e.preventDefault();
+                alert('Название тега обязательно для заполнения');
+                nameInput.focus();
+                return;
+            }
+
+            if (name.length > 50) {
+                e.preventDefault();
+                alert('Название тега не может быть длиннее 50 символов');
+                nameInput.focus();
+                return;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Создание...';
+        });
+        
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.classList.contains('error')) {
+                    this.classList.remove('error');
+                }
+                
+                const errorMsg = this.parentElement.querySelector('.error-message');
+                if (errorMsg && this.value.trim()) {
+                    errorMsg.style.opacity = '0';
+                    setTimeout(() => {
+                        errorMsg.style.display = 'none';
+                    }, 300);
+                }
+            });
+
+            input.addEventListener('focus', function() {
+                this.style.borderColor = '#9b59b6';
+            });
+
+            input.addEventListener('blur', function() {
+                if (!this.value.trim() && this.hasAttribute('required')) {
+                    this.style.borderColor = '#e74c3c';
+                } else {
+                    this.style.borderColor = '#e9ecef';
+                }
+            });
+        });
+        
+        nameInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^a-zA-Zа-яА-Я0-9\s\-]/g, '');
+        });
+
+        console.log('Страница создания тега загружена');
+    });
+</script>

@@ -75,12 +75,29 @@ public sealed class UserService(
                 includeBuilder: q => q
                     .Include(o => o.OrderStatus)
                     .Include(o => o.OrderItems)
-                        .ThenInclude(oi => oi.Product)
-                            .ThenInclude(p => p.Images)
+                    .ThenInclude(oi => oi.Product)
+                    .ThenInclude(p => p.Images)
                     .Include(o => o.OrderItems)
-                        .ThenInclude(oi => oi.Size))
+                    .ThenInclude(oi => oi.Size))
             .ToListAsync(cancellationToken);
 
-        return orders.Adapt<IEnumerable<UserOrderDto>>();
+        return orders.Select(order => new UserOrderDto
+        {
+            Id = order.Id,
+            OrderDate = order.OrderDate,
+            OrderStatus = order.OrderStatus.Name,
+            Comments = order.Comments,
+            TotalAmount = order.OrderItems.Sum(oi => (oi.Product.DiscountPrice ?? oi.Product.Price) * oi.Quantity),
+            ItemsCount = order.OrderItems.Sum(oi => oi.Quantity),
+            OrderItems = order.OrderItems.Select(oi => new UserOrderItemDto
+            {
+                ProductName = oi.Product.Name,
+                ProductImage = oi.Product.Images.FirstOrDefault()?.Image,
+                ImageFormat = oi.Product.Images.FirstOrDefault()?.Format,
+                SizeLabel = oi.Size.Label,
+                Quantity = oi.Quantity,
+                Price = oi.Product.DiscountPrice ?? oi.Product.Price
+            })
+        });
     }
 }

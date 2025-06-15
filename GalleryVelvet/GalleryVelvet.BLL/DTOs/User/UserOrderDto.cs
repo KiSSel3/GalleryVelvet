@@ -7,5 +7,6 @@ public sealed class UserOrderDto
     public string OrderStatus { get; set; } = string.Empty;
     public decimal TotalAmount { get; set; }
     public int ItemsCount { get; set; }
+    public string? Comments { get; set; }
     public IEnumerable<UserOrderItemDto> OrderItems { get; set; } = [];
 }

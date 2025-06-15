@@ -26,7 +26,7 @@ public static class MappingConfig
         TypeAdapterConfig<UserOrderDto, OrderHistoryViewModel>
             .NewConfig();
         
-        TypeAdapterConfig<UserOrderItemDto, OrderItemViewModel>
+        TypeAdapterConfig<UserOrderItemDto, OrderItemHistoryViewModel>
             .NewConfig();
     }
 }

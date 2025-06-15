@@ -47,6 +47,9 @@ public sealed class OrderService(
             LastName = createOrderDto.LastName.Trim(),
             Email = createOrderDto.Email.Trim().ToLowerInvariant(),
             PhoneNumber = createOrderDto.PhoneNumber.Trim(),
+            Comments = string.IsNullOrWhiteSpace(createOrderDto.Comments) 
+                ? null 
+                : createOrderDto.Comments.Trim(),
             UserId = userId,
             OrderStatusId = defaultStatus.Id,
             OrderItems = cartItems.Select(ci => new OrderItemEntity

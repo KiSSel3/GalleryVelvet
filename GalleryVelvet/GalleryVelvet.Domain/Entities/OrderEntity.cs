@@ -13,6 +13,8 @@ public sealed class OrderEntity : BaseEntity
     
     public required string PhoneNumber { get; set; }
     
+    public string? Comments { get; set; }
+    
     public Guid UserId { get; set; }
     public UserEntity User { get; set; } = null!;
     

@@ -1,0 +1,832 @@
+@using GalleryVelvet.Domain.Entities
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model GalleryVelvet.Presentation.Models.Admin.CreateProductRequestViewModel
+
+@{
+Layout = "_Layout";
+ViewData["Title"] = "Создание товара";
+var categories = ViewBag.Categories as IEnumerable<CategoryEntity> ?? [];
+var tags = ViewBag.Tags as IEnumerable<TagEntity> ?? [];
+var sizes = ViewBag.Sizes as IEnumerable<SizeEntity> ?? [];
+}
+
+<style>
+    .admin-page {
+        padding: 30px 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+        min-height: calc(100vh - 70px);
+        background: #f8f9fa;
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        background: white;
+        padding: 25px 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .admin-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .admin-breadcrumb {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    .admin-breadcrumb a {
+        color: #3498db;
+        text-decoration: none;
+    }
+
+    .admin-breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+    .back-btn {
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+        background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        padding: 25px 30px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.2) 20%, transparent 21%),
+        radial-gradient(circle at 40% 20%, rgba(255,255,255,0.15) 15%, transparent 16%),
+        radial-gradient(circle at 70% 80%, rgba(255,255,255,0.1) 10%, transparent 11%);
+        animation: shimmer 8s ease-in-out infinite;
+        opacity: 0.4;
+    }
+
+    @@keyframes shimmer {
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 0.7; }
+    }
+
+    .form-icon {
+        width: 80px;
+        height: 80px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        margin: 0 auto 20px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-subtitle {
+        font-size: 16px;
+        opacity: 0.9;
+        margin: 10px 0 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .form-body {
+        padding: 40px 30px;
+    }
+
+    .form-section {
+        margin-bottom: 40px;
+        padding-bottom: 30px;
+        border-bottom: 2px solid #f8f9fa;
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .required::after {
+        content: ' *';
+        color: #e74c3c;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        background: #fff;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        background: #fff8f8;
+    }
+
+    .form-input.error {
+        border-color: #e74c3c;
+        background: #fff5f5;
+    }
+
+    .form-textarea {
+        min-height: 120px;
+        resize: vertical;
+        font-family: inherit;
+        line-height: 1.5;
+    }
+
+    .form-help {
+        font-size: 13px;
+        color: #6c757d;
+        margin-top: 5px;
+        font-style: italic;
+    }
+
+    .error-message {
+        color: #e74c3c;
+        font-size: 13px;
+        margin-top: 5px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .error-message::before {
+        content: '⚠️';
+        font-size: 12px;
+    }
+
+    .checkbox-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 12px;
+        max-height: 200px;
+        overflow-y: auto;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 12px;
+        background: white;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .checkbox-item:hover {
+        background: #e9ecef;
+    }
+
+    .checkbox-item input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
+    .checkbox-label {
+        font-weight: 500;
+        color: #2c3e50;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .image-upload-section {
+        border: 2px dashed #e9ecef;
+        border-radius: 10px;
+        padding: 30px;
+        text-align: center;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+    }
+
+    .image-upload-section:hover {
+        border-color: #e74c3c;
+        background: #fff8f8;
+    }
+
+    .upload-icon {
+        font-size: 48px;
+        color: #6c757d;
+        margin-bottom: 15px;
+    }
+
+    .upload-text {
+        font-size: 16px;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        font-weight: 600;
+    }
+
+    .upload-help {
+        font-size: 14px;
+        color: #6c757d;
+        margin-bottom: 20px;
+    }
+
+    .upload-btn {
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .upload-btn:hover {
+        background: linear-gradient(135deg, #2980b9, #3498db);
+        transform: translateY(-2px);
+    }
+
+    .image-preview {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .preview-item {
+        position: relative;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .preview-image {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+    }
+
+    .preview-remove {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .preview-remove:hover {
+        background: #c0392b;
+        transform: scale(1.1);
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        padding-top: 30px;
+        border-top: 2px solid #f8f9fa;
+    }
+
+    .btn {
+        padding: 15px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        border: 2px solid transparent;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #c0392b, #e74c3c);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+    }
+
+    .btn-primary:disabled {
+        background: #95a5a6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: #6c757d;
+        border: 2px solid #dee2e6;
+    }
+
+    .btn-secondary:hover {
+        background: #f8f9fa;
+        color: #2c3e50;
+        border-color: #6c757d;
+        text-decoration: none;
+    }
+
+    .alert {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    @@media (max-width: 768px) {
+    .admin-page {
+        padding: 20px 15px;
+    }
+
+    .admin-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .form-body {
+        padding: 30px 20px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .checkbox-group {
+        grid-template-columns: 1fr;
+    }
+    }
+
+    .fade-in {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<main class="admin-page">
+    <div class="admin-header fade-in">
+        <div>
+            <h1 class="admin-title">Создание товара</h1>
+            <div class="admin-breadcrumb">
+                <a href="@Url.Action("Index", "Admin")">Главная</a> /
+                <a href="@Url.Action("Products", "Admin")">Товары</a> /
+                Создание
+            </div>
+        </div>
+        <div>
+            <a href="@Url.Action("Products", "Admin")" class="back-btn">
+                ← Назад к списку
+            </a>
+        </div>
+    </div>
+
+    @if (ViewData.ModelState.Where(x => string.IsNullOrEmpty(x.Key)).Any(x => x.Value?.Errors.Count > 0))
+    {
+    <div class="alert alert-danger fade-in">
+        <strong>Ошибка:</strong>
+        @foreach (var error in ViewData.ModelState.Where(x => string.IsNullOrEmpty(x.Key)).SelectMany(x => x.Value?.Errors ?? []))
+        {
+        <div>@error.ErrorMessage</div>
+        }
+    </div>
+    }
+
+    <form asp-action="CreateProduct" method="post" enctype="multipart/form-data" class="form-card fade-in" style="animation-delay: 0.2s;">
+        @Html.AntiForgeryToken()
+
+        <div class="form-header">
+            <div class="form-icon">🛍️</div>
+            <h2 class="form-title">Новый товар</h2>
+            <p class="form-subtitle">Добавьте новый товар в каталог магазина</p>
+        </div>
+
+        <div class="form-body">
+            <!-- Основная информация -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    📝 Основная информация
+                </h3>
+
+                <div class="form-group">
+                    <label asp-for="Name" class="form-label required">Название товара</label>
+                    <input asp-for="Name"
+                           class="form-input @(ViewData.ModelState["Name"]?.Errors.Count > 0 ? "error" : "")"
+                           placeholder="Введите название товара..."
+                           maxlength="200"
+                           required />
+                    <div class="form-help">Привлекательное и понятное название товара</div>
+                    <span asp-validation-for="Name" class="error-message"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description" class="form-label">Описание товара</label>
+                    <textarea asp-for="Description"
+                              class="form-input form-textarea @(ViewData.ModelState["Description"]?.Errors.Count > 0 ? "error" : "")"
+                              placeholder="Введите подробное описание товара..."
+                              maxlength="1000"></textarea>
+                    <div class="form-help">Подробное описание характеристик и особенностей товара</div>
+                    <span asp-validation-for="Description" class="error-message"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="CategoryId" class="form-label required">Категория</label>
+                    <select asp-for="CategoryId"
+                            class="form-input @(ViewData.ModelState["CategoryId"]?.Errors.Count > 0 ? "error" : "")"
+                            required>
+                        <option value="">Выберите категорию</option>
+                        @foreach (var category in categories)
+                        {
+                        <option value="@category.Id">@category.Name</option>
+                        }
+                    </select>
+                    <div class="form-help">Выберите подходящую категорию для товара</div>
+                    <span asp-validation-for="CategoryId" class="error-message"></span>
+                </div>
+            </div>
+
+            <!-- Цены -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    💰 Цены и скидки
+                </h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label asp-for="Price" class="form-label required">Основная цена (BYN)</label>
+                        <input asp-for="Price" type="number" step="0.01" min="0.01"
+                               class="form-input @(ViewData.ModelState["Price"]?.Errors.Count > 0 ? "error" : "")"
+                               placeholder="0.00"
+                               required />
+                        <div class="form-help">Цена товара в белорусских рублях</div>
+                        <span asp-validation-for="Price" class="error-message"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="DiscountPrice" class="form-label">Цена со скидкой (BYN)</label>
+                        <input asp-for="DiscountPrice" type="number" step="0.01" min="0"
+                               class="form-input @(ViewData.ModelState["DiscountPrice"]?.Errors.Count > 0 ? "error" : "")"
+                               placeholder="0.00" />
+                        <div class="form-help">Оставьте пустым, если скидки нет</div>
+                        <span asp-validation-for="DiscountPrice" class="error-message"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Теги -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    🏷️ Теги товара
+                </h3>
+
+                @if (tags.Any())
+                {
+                <div class="checkbox-group">
+                    @foreach (var tag in tags)
+                    {
+                    <div class="checkbox-item">
+                        <input type="checkbox" name="TagIds" value="@tag.Id" id="tag_@tag.Id" />
+                        <label for="tag_@tag.Id" class="checkbox-label">#@tag.Name</label>
+                    </div>
+                    }
+                </div>
+                <div class="form-help">Выберите подходящие теги для лучшей классификации товара</div>
+                }
+                else
+                {
+                <div style="text-align: center; color: #6c757d; font-style: italic; padding: 20px;">
+                    Теги не созданы. <a href="@Url.Action("CreateTag", "Admin")">Создать первый тег</a>
+                </div>
+                }
+            </div>
+
+            <!-- Размеры -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    📏 Доступные размеры
+                </h3>
+
+                @if (sizes.Any())
+                {
+                <div class="checkbox-group">
+                    @foreach (var size in sizes)
+                    {
+                    <div class="checkbox-item">
+                        <input type="checkbox" name="SizeIds" value="@size.Id" id="size_@size.Id" />
+                        <label for="size_@size.Id" class="checkbox-label">@size.Label</label>
+                    </div>
+                    }
+                </div>
+                <div class="form-help">Выберите размеры, в которых доступен товар</div>
+                }
+                else
+                {
+                <div style="text-align: center; color: #6c757d; font-style: italic; padding: 20px;">
+                    Размеры не созданы. Обратитесь к администратору для добавления размеров.
+                </div>
+                }
+            </div>
+
+            <!-- Изображения -->
+            <div class="form-section">
+                <h3 class="section-title">
+                    📸 Изображения товара
+                </h3>
+
+                <div class="image-upload-section">
+                    <div class="upload-icon">📷</div>
+                    <div class="upload-text">Загрузите изображения товара</div>
+                    <div class="upload-help">Поддерживаются файлы JPG, PNG, GIF, WEBP. Максимальный размер: 5 МБ</div>
+                    <input asp-for="Images" multiple accept="image/*" style="display: none;" id="imageInput" />
+                    <button type="button" class="upload-btn" onclick="document.getElementById('imageInput').click()">
+                        Выбрать файлы
+                    </button>
+                </div>
+
+                <div class="image-preview" id="imagePreview"></div>
+                <span asp-validation-for="Images" class="error-message"></span>
+            </div>
+
+            <div class="form-actions">
+                <a href="@Url.Action("Products", "Admin")" class="btn btn-secondary">
+                    ❌ Отмена
+                </a>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    🛍️ Создать товар
+                </button>
+            </div>
+        </div>
+    </form>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const submitBtn = document.getElementById('submitBtn');
+        const imageInput = document.getElementById('imageInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const priceInput = document.getElementById('Price');
+        const discountPriceInput = document.getElementById('DiscountPrice');
+
+        // Обработчик выбора изображений
+        imageInput.addEventListener('change', function(e) {
+            imagePreview.innerHTML = ''; // Очищаем предыдущий preview
+
+            const files = Array.from(e.target.files);
+
+            if (files.length === 0) return;
+
+            files.forEach((file, index) => {
+                // Проверяем тип файла
+                if (!file.type.startsWith('image/')) {
+                    alert(`Файл "${file.name}" не является изображением`);
+                    return;
+                }
+
+                // Проверяем размер файла (5 МБ)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`Файл "${file.name}" слишком большой. Максимальный размер: 5 МБ`);
+                    return;
+                }
+
+                // Создаем preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    addImagePreview(e.target.result, file.name, index);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function addImagePreview(src, name, index) {
+            const previewItem = document.createElement('div');
+            previewItem.className = 'preview-item';
+            previewItem.dataset.imageIndex = index;
+
+            previewItem.innerHTML = `
+                <img src="${src}" alt="${name}" class="preview-image" />
+                <button type="button" class="preview-remove" onclick="removeImage(${index})">×</button>
+                <div style="padding: 8px; font-size: 12px; text-align: center; background: #f8f9fa;">
+                    ${name}
+                </div>
+            `;
+
+            imagePreview.appendChild(previewItem);
+        }
+
+        window.removeImage = function(index) {
+            // Удаляем preview
+            const previewItem = document.querySelector(`[data-image-index="${index}"]`);
+            if (previewItem) {
+                previewItem.remove();
+            }
+
+            // Создаем новый input без удаленного файла
+            const dt = new DataTransfer();
+            const files = Array.from(imageInput.files);
+
+            files.forEach((file, i) => {
+                if (i !== index) {
+                    dt.items.add(file);
+                }
+            });
+
+            imageInput.files = dt.files;
+
+            // Обновляем preview для оставшихся файлов
+            imagePreview.innerHTML = '';
+            Array.from(imageInput.files).forEach((file, i) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    addImagePreview(e.target.result, file.name, i);
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+
+        // Валидация цен
+        function validatePrices() {
+            const price = parseFloat(priceInput.value) || 0;
+            const discountPrice = parseFloat(discountPriceInput.value) || 0;
+
+            if (discountPrice > 0 && discountPrice >= price) {
+                discountPriceInput.style.borderColor = '#e74c3c';
+                return false;
+            } else {
+                discountPriceInput.style.borderColor = '#e9ecef';
+                return true;
+            }
+        }
+
+        priceInput.addEventListener('input', validatePrices);
+        discountPriceInput.addEventListener('input', validatePrices);
+        
+        form.addEventListener('submit', function(e) {
+            if (!validatePrices()) {
+                e.preventDefault();
+                alert('Цена со скидкой должна быть меньше основной цены');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Создание товара...';
+        });
+        
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                if (this.classList.contains('error')) {
+                    this.classList.remove('error');
+                }
+
+                const errorMsg = this.parentElement.querySelector('.error-message');
+                if (errorMsg && this.value.trim()) {
+                    errorMsg.style.opacity = '0';
+                    setTimeout(() => {
+                        errorMsg.style.display = 'none';
+                    }, 300);
+                }
+            });
+
+            input.addEventListener('focus', function() {
+                this.style.borderColor = '#e74c3c';
+            });
+
+            input.addEventListener('blur', function() {
+                if (!this.value.trim() && this.hasAttribute('required')) {
+                    this.style.borderColor = '#e74c3c';
+                } else {
+                    this.style.borderColor = '#e9ecef';
+                }
+            });
+        });
+
+        console.log('Страница создания товара загружена');
+    });
+</script>

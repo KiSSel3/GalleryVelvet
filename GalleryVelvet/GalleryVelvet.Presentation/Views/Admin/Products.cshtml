@@ -1,0 +1,846 @@
+@model GalleryVelvet.Presentation.Models.Admin.ProductsAdminViewModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Управление товарами";
+}
+
+<style>
+    .admin-page {
+        padding: 30px 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+        min-height: calc(100vh - 70px);
+        background: #f8f9fa;
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        background: white;
+        padding: 25px 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .admin-title {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+    }
+
+    .admin-breadcrumb {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    .admin-breadcrumb a {
+        color: #3498db;
+        text-decoration: none;
+    }
+
+    .admin-breadcrumb a:hover {
+        text-decoration: underline;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 15px;
+    }
+
+    .create-btn {
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .create-btn:hover {
+        background: linear-gradient(135deg, #c0392b, #e74c3c);
+        color: white;
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+    }
+
+    .admin-filters {
+        background: white;
+        padding: 25px 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    .filters-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto;
+        gap: 20px;
+        align-items: end;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filter-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .filter-input {
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .filter-input:focus {
+        outline: none;
+        border-color: #e74c3c;
+        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+    }
+
+    .filter-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 0;
+    }
+
+    .filter-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+    }
+
+    .filter-checkbox label {
+        cursor: pointer;
+        font-weight: 500;
+        color: #2c3e50;
+    }
+
+    .filter-btn {
+        padding: 12px 25px;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .filter-btn:hover {
+        background: linear-gradient(135deg, #2980b9, #3498db);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 25px;
+    }
+
+    .product-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        position: relative;
+    }
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        border-color: #e74c3c;
+    }
+
+    .product-card.deleted {
+        opacity: 0.6;
+        border-color: #95a5a6;
+    }
+
+    .product-card.deleted:hover {
+        border-color: #7f8c8d;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        position: relative;
+    }
+
+    .product-image-placeholder {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #ecf0f1, #bdc3c7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        color: #7f8c8d;
+    }
+
+    .product-status {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 6px 12px;
+        border-radius: 15px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-active {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .status-deleted {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    .status-discount {
+        background: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeaa7;
+    }
+
+    .product-body {
+        padding: 20px;
+    }
+
+    .product-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        line-height: 1.3;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .product-category {
+        font-size: 12px;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 10px;
+        font-weight: 500;
+    }
+
+    .product-price {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .price-current {
+        font-size: 20px;
+        font-weight: 700;
+        color: #e74c3c;
+    }
+
+    .price-original {
+        font-size: 16px;
+        color: #6c757d;
+        text-decoration: line-through;
+    }
+
+    .discount-badge {
+        background: #e74c3c;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 600;
+    }
+
+    .product-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 15px;
+        min-height: 25px;
+    }
+
+    .tag-badge {
+        background: #e9ecef;
+        color: #495057;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    .product-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .action-btn-edit {
+        background: #f39c12;
+        color: white;
+    }
+
+    .action-btn-edit:hover {
+        background: #e67e22;
+        color: white;
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+
+    .action-btn-delete {
+        background: #e74c3c;
+        color: white;
+    }
+
+    .action-btn-delete:hover {
+        background: #c0392b;
+        transform: translateY(-1px);
+    }
+
+    .action-btn-restore {
+        background: #27ae60;
+        color: white;
+    }
+
+    .action-btn-restore:hover {
+        background: #229954;
+        transform: translateY(-1px);
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 30px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        grid-column: 1 / -1;
+    }
+
+    .empty-state-icon {
+        font-size: 64px;
+        margin-bottom: 25px;
+        opacity: 0.5;
+    }
+
+    .empty-state-text {
+        font-size: 24px;
+        margin-bottom: 15px;
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .empty-state-subtext {
+        font-size: 16px;
+        opacity: 0.7;
+        color: #6c757d;
+        margin-bottom: 30px;
+    }
+
+    .pagination {
+        margin-top: 40px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .pagination-link {
+        padding: 10px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        color: #e74c3c;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .pagination-link:hover {
+        background: #e74c3c;
+        color: white;
+        text-decoration: none;
+        border-color: #e74c3c;
+    }
+
+    .pagination-link.active {
+        background: #e74c3c;
+        color: white;
+        border-color: #e74c3c;
+    }
+
+    .pagination-link.disabled {
+        color: #6c757d;
+        background: #f8f9fa;
+        cursor: not-allowed;
+        border-color: #e9ecef;
+    }
+
+    .alert {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 500;
+    }
+
+    .alert-success {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+    }
+
+    .stats-bar {
+        display: flex;
+        gap: 20px;
+        background: white;
+        padding: 20px 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+
+    .stat-item {
+        text-align: center;
+        flex: 1;
+    }
+
+    .stat-number {
+        font-size: 24px;
+        font-weight: 700;
+        color: #2c3e50;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #6c757d;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    @@media (max-width: 768px) {
+        .admin-page {
+            padding: 20px 15px;
+        }
+
+        .admin-header {
+            flex-direction: column;
+            gap: 15px;
+            text-align: center;
+        }
+
+        .header-actions {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .filters-row {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .stats-bar {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .products-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .product-actions {
+            flex-direction: column;
+        }
+    }
+
+    .fade-in {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<main class="admin-page">
+    <div class="admin-header fade-in">
+        <div>
+            <h1 class="admin-title">Управление товарами</h1>
+            <div class="admin-breadcrumb">
+                <a href="@Url.Action("Index", "Admin")">Главная</a> / Товары
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="@Url.Action("CreateProduct", "Admin")" class="create-btn">
+                🛍️ Добавить товар
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success fade-in">
+            @TempData["Success"]
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger fade-in">
+            @TempData["Error"]
+        </div>
+    }
+
+    <div class="stats-bar fade-in">
+        <div class="stat-item">
+            <span class="stat-number">@Model.Products.Where(p => !p.IsDeleted).Count()</span>
+            <span class="stat-label">Активные</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">@Model.Products.Where(p => p.IsDeleted).Count()</span>
+            <span class="stat-label">Удаленные</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">@Model.Products.Where(p => p.DiscountPrice.HasValue && p.DiscountPrice < p.Price).Count()</span>
+            <span class="stat-label">Со скидкой</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number">@Model.Products.MetaData.TotalCount</span>
+            <span class="stat-label">Всего</span>
+        </div>
+    </div>
+
+    <form method="get" class="admin-filters fade-in">
+        <div class="filters-row">
+            <div class="filter-group">
+                <label class="filter-label">Поиск товаров</label>
+                <input type="text" name="searchTerm" value="@Model.SearchTerm" 
+                       class="filter-input" placeholder="Введите название товара...">
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Категория</label>
+                <select name="categoryId" class="filter-input">
+                    <option value="">Все категории</option>
+                    @foreach (var category in Model.Categories)
+                    {
+                        <option value="@category.Id" selected="@(Model.SelectedCategoryId == category.Id)">
+                            @category.Name
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label class="filter-label">Опции</label>
+                <div class="filter-checkbox">
+                    <input type="checkbox" name="includeDeleted" value="true" 
+                           id="includeDeleted" checked="@Model.IncludeDeleted">
+                    <label for="includeDeleted">Показать удаленные</label>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <button type="submit" class="filter-btn">
+                    🔍 Поиск
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <div class="products-grid">
+        @if (Model.Products.Any())
+        {
+            @foreach (var product in Model.Products)
+            {
+                <div class="product-card @(product.IsDeleted ? "deleted" : "") fade-in" 
+                     style="animation-delay: @(Model.Products.ToList().IndexOf(product) * 0.05)s;">
+                    
+                    @{
+                        var hasDiscount = product.DiscountPrice.HasValue && product.DiscountPrice < product.Price;
+                        var mainImage = product.Images.FirstOrDefault();
+                    }
+
+                    <!-- Статус товара -->
+                    <div class="product-status @(product.IsDeleted ? "status-deleted" : hasDiscount ? "status-discount" : "status-active")">
+                        @if (product.IsDeleted)
+                        {
+                            <text>Удален</text>
+                        }
+                        else if (hasDiscount)
+                        {
+                            <text>Скидка</text>
+                        }
+                        else
+                        {
+                            <text>Активен</text>
+                        }
+                    </div>
+
+                    <!-- Изображение товара -->
+                    @if (mainImage != null && !string.IsNullOrWhiteSpace(mainImage.Image))
+                    {
+                        <img src="data:image/@(mainImage.Format ?? "jpeg");base64,@mainImage.Image" 
+                             alt="@product.Name" class="product-image" />
+                    }
+                    else
+                    {
+                        <div class="product-image-placeholder">
+                            🛍️
+                        </div>
+                    }
+
+                    <div class="product-body">
+                        <!-- Категория -->
+                        <div class="product-category">@product.Category.Name</div>
+
+                        <!-- Название -->
+                        <h3 class="product-name">@product.Name</h3>
+
+                        <!-- Цена -->
+                        <div class="product-price">
+                            @if (hasDiscount)
+                            {
+                                <span class="price-current">@product.DiscountPrice?.ToString("N0") BYN</span>
+                                <span class="price-original">@product.Price.ToString("N0") BYN</span>
+                                <span class="discount-badge">
+                                    -@(Math.Round((1 - (product.DiscountPrice!.Value / product.Price)) * 100))%
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="price-current">@product.Price.ToString("N0") BYN</span>
+                            }
+                        </div>
+
+                        <!-- Теги -->
+                        <div class="product-tags">
+                            @foreach (var productTag in product.ProductTags.Take(3))
+                            {
+                                <span class="tag-badge">#@productTag.Tag.Name</span>
+                            }
+                            @if (product.ProductTags.Count > 3)
+                            {
+                                <span class="tag-badge">+@(product.ProductTags.Count - 3)</span>
+                            }
+                        </div>
+
+                        <!-- Действия -->
+                        <div class="product-actions">
+                            <a href="@Url.Action("EditProduct", "Admin", new { id = product.Id })" 
+                               class="action-btn action-btn-edit">
+                                ✏️ Редактировать
+                            </a>
+
+                            @if (product.IsDeleted)
+                            {
+                                <form asp-action="RestoreProduct" asp-route-id="@product.Id" method="post" 
+                                      style="flex: 1;" onsubmit="return confirmRestore('@product.Name')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="action-btn action-btn-restore" style="width: 100%;">
+                                        🔄 Восстановить
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="DeleteProduct" asp-route-id="@product.Id" method="post" 
+                                      style="flex: 1;" onsubmit="return confirmDelete('@product.Name')">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="action-btn action-btn-delete" style="width: 100%;">
+                                        🗑️ Удалить
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-state-icon">🛍️</div>
+                <div class="empty-state-text">Товары не найдены</div>
+                <div class="empty-state-subtext">
+                    @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+                    {
+                        <text>По запросу "@Model.SearchTerm" ничего не найдено. Попробуйте изменить параметры поиска.</text>
+                    }
+                    else
+                    {
+                        <text>В системе пока нет товаров. Добавьте первый товар в каталог.</text>
+                    }
+                </div>
+                
+                @if (string.IsNullOrWhiteSpace(Model.SearchTerm))
+                {
+                    <a href="@Url.Action("CreateProduct", "Admin")" class="create-btn">
+                        🛍️ Добавить первый товар
+                    </a>
+                }
+            </div>
+        }
+    </div>
+
+    @if (Model.Products.MetaData.TotalPages > 1)
+    {
+        <div class="pagination">
+            @if (Model.Products.MetaData.HasPrevious)
+            {
+                <a href="@Url.Action("Products", "Admin", new { 
+                    pageNumber = Model.Products.MetaData.CurrentPage - 1,
+                    searchTerm = Model.SearchTerm,
+                    categoryId = Model.SelectedCategoryId,
+                    includeDeleted = Model.IncludeDeleted
+                })" class="pagination-link">← Назад</a>
+            }
+            else
+            {
+                <span class="pagination-link disabled">← Назад</span>
+            }
+
+            @for (int i = Math.Max(1, Model.Products.MetaData.CurrentPage - 2); 
+                  i <= Math.Min(Model.Products.MetaData.TotalPages, Model.Products.MetaData.CurrentPage + 2); 
+                  i++)
+            {
+                if (i == Model.Products.MetaData.CurrentPage)
+                {
+                    <span class="pagination-link active">@i</span>
+                }
+                else
+                {
+                    <a href="@Url.Action("Products", "Admin", new { 
+                        pageNumber = i,
+                        searchTerm = Model.SearchTerm,
+                        categoryId = Model.SelectedCategoryId,
+                        includeDeleted = Model.IncludeDeleted
+                    })" class="pagination-link">@i</a>
+                }
+            }
+
+            @if (Model.Products.MetaData.HasNext)
+            {
+                <a href="@Url.Action("Products", "Admin", new { 
+                    pageNumber = Model.Products.MetaData.CurrentPage + 1,
+                    searchTerm = Model.SearchTerm,
+                    categoryId = Model.SelectedCategoryId,
+                    includeDeleted = Model.IncludeDeleted
+                })" class="pagination-link">Вперед →</a>
+            }
+            else
+            {
+                <span class="pagination-link disabled">Вперед →</span>
+            }
+        </div>
+    }
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filters = document.querySelectorAll('.filter-input, input[type="checkbox"]');
+        filters.forEach(filter => {
+            if (filter.type === 'checkbox' || filter.tagName === 'SELECT') {
+                filter.addEventListener('change', function() {
+                    this.form.submit();
+                });
+            }
+        });
+        
+        const searchInput = document.querySelector('input[name="searchTerm"]');
+        let searchTimeout;
+        
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    this.form.submit();
+                }, 500);
+            });
+        }
+        
+        const productCards = document.querySelectorAll('.product-card:not(.deleted)');
+        productCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('deleted')) {
+                    this.style.transform = 'translateY(-8px) scale(1.02)';
+                }
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        console.log('Страница управления товарами загружена');
+    });
+
+    function confirmDelete(productName) {
+        return confirm(`Вы уверены, что хотите удалить товар "${productName}"?\n\nТовар будет скрыт из каталога, но не удален полностью.`);
+    }
+
+    function confirmRestore(productName) {
+        return confirm(`Восстановить товар "${productName}" в каталоге?`);
+    }
+</script>

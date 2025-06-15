@@ -7,5 +7,6 @@ public sealed class OrderHistoryViewModel
     public string OrderStatus { get; set; } = string.Empty;
     public decimal TotalAmount { get; set; }
     public int ItemsCount { get; set; }
-    public IEnumerable<OrderItemViewModel> OrderItems { get; set; } = [];
+    public string? Comments { get; set; }
+    public IEnumerable<OrderItemHistoryViewModel> OrderItems { get; set; } = [];
 }

@@ -1,0 +1,460 @@
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Панель администратора";
+}
+
+<style>
+    :root {
+        --admin-primary: #2c3e50;
+        --admin-secondary: #34495e;
+        --admin-accent: #3498db;
+        --admin-success: #27ae60;
+        --admin-warning: #f39c12;
+        --admin-danger: #e74c3c;
+        --admin-light: #ecf0f1;
+        --admin-dark: #1a252f;
+        --admin-border: #bdc3c7;
+        --admin-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        --admin-radius: 8px;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .admin-container {
+        min-height: calc(100vh - 70px);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 40px 20px;
+    }
+
+    .admin-header {
+        text-align: center;
+        margin-bottom: 50px;
+        color: white;
+    }
+
+    .admin-title {
+        font-size: 48px;
+        font-weight: 300;
+        margin-bottom: 15px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        letter-spacing: 2px;
+    }
+
+    .admin-subtitle {
+        font-size: 18px;
+        opacity: 0.9;
+        font-weight: 300;
+    }
+
+    .admin-grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+    }
+
+    .admin-card {
+        background: white;
+        border-radius: var(--admin-radius);
+        box-shadow: var(--admin-shadow);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .admin-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .admin-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--admin-accent), var(--admin-success));
+    }
+
+    .admin-card-header {
+        padding: 30px 30px 20px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 1px solid var(--admin-border);
+    }
+
+    .admin-card-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--admin-accent), var(--admin-secondary));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        font-size: 24px;
+        color: white;
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .admin-card-title {
+        font-size: 22px;
+        font-weight: 600;
+        color: var(--admin-primary);
+        text-align: center;
+        margin-bottom: 10px;
+    }
+
+    .admin-card-description {
+        font-size: 14px;
+        color: #6c757d;
+        text-align: center;
+        line-height: 1.5;
+    }
+
+    .admin-card-body {
+        padding: 30px;
+    }
+
+    .admin-card-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .admin-btn {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        border-radius: var(--admin-radius);
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .admin-btn-primary {
+        background: linear-gradient(135deg, var(--admin-accent), #2980b9);
+        color: white;
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .admin-btn-primary:hover {
+        background: linear-gradient(135deg, #2980b9, var(--admin-accent));
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .admin-btn-secondary {
+        background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        color: white;
+        box-shadow: 0 4px 15px rgba(149, 165, 166, 0.3);
+    }
+
+    .admin-btn-secondary:hover {
+        background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(149, 165, 166, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .admin-quick-actions {
+        background: white;
+        border-radius: var(--admin-radius);
+        box-shadow: var(--admin-shadow);
+        padding: 30px;
+        margin-top: 40px;
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .quick-actions-title {
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--admin-primary);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+
+    .quick-action-btn {
+        padding: 15px 20px;
+        background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        border: 2px solid var(--admin-border);
+        border-radius: var(--admin-radius);
+        text-decoration: none;
+        color: var(--admin-primary);
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .quick-action-btn:hover {
+        background: linear-gradient(135deg, var(--admin-accent), #2980b9);
+        color: white;
+        border-color: var(--admin-accent);
+        text-decoration: none;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+    }
+
+    .admin-icon {
+        font-size: 18px;
+    }
+
+    @@media (max-width: 768px) {
+        .admin-container {
+            padding: 20px 15px;
+        }
+
+        .admin-title {
+            font-size: 36px;
+        }
+
+        .admin-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .admin-card-header,
+        .admin-card-body {
+            padding: 20px;
+        }
+
+        .admin-card-actions {
+            flex-direction: column;
+        }
+
+        .quick-actions-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .fade-in {
+        animation: fadeInUp 0.6s ease-out;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<main class="admin-container">
+    <div class="admin-header fade-in">
+        <h1 class="admin-title">Панель Администратора</h1>
+        <p class="admin-subtitle">Управление системой интернет-магазина</p>
+    </div>
+
+    <div class="admin-grid">
+        <div class="admin-card fade-in" style="animation-delay: 0.1s;">
+            <div class="admin-card-header">
+                <div class="admin-card-icon">
+                    📦
+                </div>
+                <h3 class="admin-card-title">Управление заказами</h3>
+                <p class="admin-card-description">
+                    Просмотр, обработка и изменение статусов заказов клиентов
+                </p>
+            </div>
+            <div class="admin-card-body">
+                <div class="admin-card-actions">
+                    <a href="@Url.Action("Orders", "Admin")" class="admin-btn admin-btn-primary">
+                        <span class="admin-icon">👁️</span>
+                        Просмотр
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-card fade-in" style="animation-delay: 0.2s;">
+            <div class="admin-card-header">
+                <div class="admin-card-icon">
+                    👥
+                </div>
+                <h3 class="admin-card-title">Управление пользователями</h3>
+                <p class="admin-card-description">
+                    Управление учетными записями и ролями пользователей
+                </p>
+            </div>
+            <div class="admin-card-body">
+                <div class="admin-card-actions">
+                    <a href="@Url.Action("Users", "Admin")" class="admin-btn admin-btn-primary">
+                        <span class="admin-icon">👁️</span>
+                        Просмотр
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-card fade-in" style="animation-delay: 0.3s;">
+            <div class="admin-card-header">
+                <div class="admin-card-icon">
+                    🏷️
+                </div>
+                <h3 class="admin-card-title">Категории и теги</h3>
+                <p class="admin-card-description">
+                    Создание и редактирование категорий товаров и тегов
+                </p>
+            </div>
+            <div class="admin-card-body">
+                <div class="admin-card-actions">
+                    <a href="@Url.Action("Categories", "Admin")" class="admin-btn admin-btn-primary">
+                        <span class="admin-icon">📂</span>
+                        Категории
+                    </a>
+                    <a href="@Url.Action("Tags", "Admin")" class="admin-btn admin-btn-secondary">
+                        <span class="admin-icon">🏷️</span>
+                        Теги
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-card fade-in" style="animation-delay: 0.4s;">
+            <div class="admin-card-header">
+                <div class="admin-card-icon">
+                    🛍️
+                </div>
+                <h3 class="admin-card-title">Управление товарами</h3>
+                <p class="admin-card-description">
+                    Добавление, редактирование и управление каталогом товаров
+                </p>
+            </div>
+            <div class="admin-card-body">
+                <div class="admin-card-actions">
+                    <a href="@Url.Action("Products", "Admin")" class="admin-btn admin-btn-primary">
+                        <span class="admin-icon">👁️</span>
+                        Просмотр
+                    </a>
+                    <a href="@Url.Action("CreateProduct", "Admin")" class="admin-btn admin-btn-secondary">
+                        <span class="admin-icon">➕</span>
+                        Создать
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-quick-actions fade-in" style="animation-delay: 0.5s;">
+        <h3 class="quick-actions-title">Быстрые действия</h3>
+        <div class="quick-actions-grid">
+            <a href="@Url.Action("CreateCategory", "Admin")" class="quick-action-btn">
+                <span class="admin-icon">📂</span>
+                Новая категория
+            </a>
+            <a href="@Url.Action("CreateTag", "Admin")" class="quick-action-btn">
+                <span class="admin-icon">🏷️</span>
+                Новый тег
+            </a>
+            <a href="@Url.Action("CreateProduct", "Admin")" class="quick-action-btn">
+                <span class="admin-icon">🛍️</span>
+                Новый товар
+            </a>
+            <a href="@Url.Action("Orders", "Admin")" class="quick-action-btn">
+                <span class="admin-icon">📦</span>
+                Последние заказы
+            </a>
+            <a href="@Url.Action("Users", "Admin")" class="quick-action-btn">
+                <span class="admin-icon">👥</span>
+                Новые пользователи
+            </a>
+            <a href="@Url.Action("Products", "Admin", new { includeDeleted = true })" class="quick-action-btn">
+                <span class="admin-icon">🗑️</span>
+                Удаленные товары
+            </a>
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const cards = document.querySelectorAll('.fade-in');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+        });
+        
+        const adminCards = document.querySelectorAll('.admin-card');
+        adminCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px) scale(1.02)';
+            });
+
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+        
+        const buttons = document.querySelectorAll('.admin-btn, .quick-action-btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        console.log('Панель администратора загружена');
+    });
+</script>
+
+<style>
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        pointer-events: none;
+        animation: rippleEffect 0.6s ease-out;
+    }
+
+    @@keyframes rippleEffect {
+        to {
+            transform: scale(2);
+            opacity: 0;
+        }
+    }
+</style>
