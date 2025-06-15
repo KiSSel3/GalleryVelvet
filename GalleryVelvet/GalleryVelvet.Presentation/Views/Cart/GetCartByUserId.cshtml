@@ -1,8 +1,8 @@
 @model GalleryVelvet.Presentation.Models.Cart.CartPageViewModel
 
 @{
-var totalPrice = Model.CartItems.Sum(item => (item.Product.DiscountPrice ?? item.Product.Price) * item.Quantity);
-Layout = "_Layout";
+    var totalPrice = Model.CartItems.Sum(item => (item.Product.DiscountPrice ?? item.Product.Price) * item.Quantity);
+    Layout = "_Layout";
 }
 
 <style>
@@ -143,6 +143,11 @@ Layout = "_Layout";
         background-color: #f8fff9;
     }
 
+    .form-input.error {
+        border-color: #dc3545;
+        background-color: #fff5f5;
+    }
+
     .form-select {
         width: 100%;
         padding: 12px 15px;
@@ -213,12 +218,55 @@ Layout = "_Layout";
         color: #333;
     }
 
+    .error-message {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 5px;
+        font-weight: 500;
+    }
+
+    .general-error {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 12px 15px;
+        margin-bottom: 20px;
+        font-size: 13px;
+        border-radius: 4px;
+    }
+
     .order-summary {
         background: #fff;
         padding: 30px;
         border: 1px solid #e5e5e5;
         position: sticky;
         top: 120px;
+    }
+
+    .create-order-btn {
+        background-color: #000;
+        color: #fff;
+        border: none;
+        padding: 20px 40px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        margin-top: 30px;
+        border: 2px solid #000;
+    }
+
+    .create-order-btn:hover {
+        background-color: #333;
+    }
+
+    .create-order-btn:disabled {
+        background-color: #ccc;
+        border-color: #ccc;
+        cursor: not-allowed;
     }
 
     .cart-item {
@@ -334,6 +382,47 @@ Layout = "_Layout";
         border-color: #666;
     }
 
+    .empty-cart {
+        text-align: center;
+        padding: 100px 20px;
+        background: #fff;
+        border: 1px solid #e5e5e5;
+    }
+
+    .empty-cart h2 {
+        font-size: 24px;
+        font-weight: 300;
+        margin-bottom: 20px;
+        color: #333;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .empty-cart p {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 30px;
+    }
+
+    .shop-link {
+        background-color: #000;
+        color: #fff;
+        padding: 15px 30px;
+        text-decoration: none;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-block;
+        border: 2px solid #000;
+    }
+
+    .shop-link:hover {
+        background-color: transparent;
+        color: #000;
+    }
+
     @@media (max-width: 1024px) {
     .checkout-layout {
         grid-template-columns: 1fr;
@@ -373,147 +462,198 @@ Layout = "_Layout";
     <div class="checkout-container">
         <h1 class="checkout-title">ОФОРМЛЕНИЕ ЗАКАЗА</h1>
 
-        <div class="checkout-layout">
-            <div class="checkout-forms">
-                <div class="form-section">
-                    <div class="section-header" onclick="toggleSection(this)">
-                        <div class="section-number">1</div>
-                        <div class="section-title">Тип доставки</div>
-                        <div class="section-toggle">−</div>
-                    </div>
-                    <div class="section-content active">
-                        <div class="delivery-options">
-                            <div class="delivery-option active" onclick="selectDelivery(this, 'delivery')">
-                                ДОСТАВКА
+        @if (!Model.CartItems.Any())
+        {
+        <div class="empty-cart">
+            <h2>Ваша корзина пуста</h2>
+            <p>Добавьте товары в корзину, чтобы оформить заказ</p>
+            <a href="@Url.Action("Index", "Product")" class="shop-link">
+                Перейти к покупкам
+            </a>
+        </div>
+        }
+        else
+        {
+        <form asp-action="CreateOrder" method="post" id="orderForm">
+            @Html.AntiForgeryToken()
+
+            <div class="checkout-layout">
+                <div class="checkout-forms">
+                    <div class="form-section">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <div class="section-number">1</div>
+                            <div class="section-title">Тип доставки</div>
+                            <div class="section-toggle">−</div>
+                        </div>
+                        <div class="section-content active">
+                            <div class="delivery-options">
+                                <div class="delivery-option active" onclick="selectDelivery(this, 'delivery')">
+                                    ДОСТАВКА
+                                </div>
+                                <div class="delivery-option" onclick="selectDelivery(this, 'pickup')">
+                                    САМОВЫВОЗ
+                                </div>
                             </div>
-                            <div class="delivery-option" onclick="selectDelivery(this, 'pickup')">
-                                САМОВЫВОЗ
+                            <input type="hidden" name="DeliveryType" id="deliveryType" value="delivery" />
+                            @Html.ValidationMessageFor(m => ((GalleryVelvet.BLL.DTOs.Order.CreateOrderDto)ViewData["CreateOrderDto"])!.DeliveryType, "", new { @class = "error-message" })
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <div class="section-header" onclick="toggleSection(this)">
+                            <div class="section-number">2</div>
+                            <div class="section-title">Детали заказа</div>
+                            <div class="section-toggle">−</div>
+                        </div>
+                        <div class="section-content active">
+                            @if (ViewData.ModelState.Where(x => string.IsNullOrEmpty(x.Key)).Any(x => x.Value?.Errors.Count > 0))
+                            {
+                            <div class="general-error">
+                                @foreach (var error in ViewData.ModelState.Where(x => string.IsNullOrEmpty(x.Key)).SelectMany(x => x.Value?.Errors ?? []))
+                                {
+                                <div>@error.ErrorMessage</div>
+                                }
+                            </div>
+                            }
+
+                            @if (Model.UserProfile != null)
+                            {
+                            <div class="autofill-notice" id="autofillNotice">
+                                <i class="fas fa-check-circle"></i>
+                                Данные автоматически заполнены из вашего профиля
+                                <button type="button" class="clear-form-btn" onclick="clearForm()">
+                                    Очистить форму
+                                </button>
+                            </div>
+                            }
+
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <div>
+                                        <input type="text"
+                                               name="FirstName"
+                                               class="form-input @(ViewData.ModelState["FirstName"]?.Errors.Count > 0 ? "error" : "")"
+                                               id="firstName"
+                                               placeholder="Имя *"
+                                               value="@ViewData["FirstName"]"
+                                               required>
+                                        @Html.ValidationMessageFor(m => ((GalleryVelvet.BLL.DTOs.Order.CreateOrderDto)ViewData["CreateOrderDto"])!.FirstName, "", new { @class = "error-message" })
+                                    </div>
+                                    <div>
+                                        <input type="text"
+                                               name="LastName"
+                                               class="form-input @(ViewData.ModelState["LastName"]?.Errors.Count > 0 ? "error" : "")"
+                                               id="lastName"
+                                               placeholder="Фамилия *"
+                                               value="@ViewData["LastName"]"
+                                               required>
+                                        @Html.ValidationMessageFor(m => ((GalleryVelvet.BLL.DTOs.Order.CreateOrderDto)ViewData["CreateOrderDto"])!.LastName, "", new { @class = "error-message" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="phone-input-group">
+                                    <select class="form-select phone-prefix">
+                                        <option value="+375">+375</option>
+                                    </select>
+                                    <input type="tel"
+                                           name="PhoneNumber"
+                                           class="form-input phone-number @(ViewData.ModelState["PhoneNumber"]?.Errors.Count > 0 ? "error" : "")"
+                                           id="phoneNumber"
+                                           placeholder="Телефон *"
+                                           value="@ViewData["PhoneNumber"]"
+                                           required>
+                                </div>
+                                @Html.ValidationMessageFor(m => ((GalleryVelvet.BLL.DTOs.Order.CreateOrderDto)ViewData["CreateOrderDto"])!.PhoneNumber, "", new { @class = "error-message" })
+                            </div>
+
+                            <div class="form-group">
+                                <input type="email"
+                                       name="Email"
+                                       class="form-input @(ViewData.ModelState["Email"]?.Errors.Count > 0 ? "error" : "")"
+                                       id="email"
+                                       placeholder="Email *"
+                                       value="@ViewData["Email"]"
+                                       required>
+                                @Html.ValidationMessageFor(m => ((GalleryVelvet.BLL.DTOs.Order.CreateOrderDto)ViewData["CreateOrderDto"])!.Email, "", new { @class = "error-message" })
+                            </div>
+
+                            <div class="form-group">
+                                    <textarea name="Comments"
+                                              class="form-textarea @(ViewData.ModelState["Comments"]?.Errors.Count > 0 ? "error" : "")"
+                                              id="comments"
+                                              placeholder="Комментарии">@ViewData["Comments"]</textarea>
+                                @Html.ValidationMessageFor(m => ((GalleryVelvet.BLL.DTOs.Order.CreateOrderDto)ViewData["CreateOrderDto"])!.Comments, "", new { @class = "error-message" })
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <div class="section-header" onclick="toggleSection(this)">
-                        <div class="section-number">2</div>
-                        <div class="section-title">Детали заказа</div>
-                        <div class="section-toggle">−</div>
-                    </div>
-                    <div class="section-content active">
-                        @if (Model.UserProfile != null)
+                <div class="order-summary">
+                    <div style="margin-bottom: 30px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                            <div class="section-number">3</div>
+                            <div class="section-title" style="margin-left: 15px;">Состав заказа</div>
+                        </div>
+
+                        @foreach (var item in Model.CartItems)
                         {
-                        <div class="autofill-notice" id="autofillNotice">
-                            <i class="fas fa-check-circle"></i>
-                            Данные автоматически заполнены из вашего профиля
-                            <button type="button" class="clear-form-btn" onclick="clearForm()">
-                                Очистить форму
-                            </button>
+                        var product = item.Product;
+                        var image = product.Images.FirstOrDefault()?.Image ?? "";
+                        var format = product.Images.FirstOrDefault()?.Format ?? "jpeg";
+
+                        var base64Src = string.IsNullOrWhiteSpace(image)
+                        ? "/images/no-image_0.jpg"
+                        : $"data:image/{format};base64,{image}";
+
+                        var price = product.DiscountPrice ?? product.Price;
+
+                        <div class="cart-item">
+                            <img src="@base64Src" alt="@product.Name" class="item-image"/>
+
+                            <div class="item-details">
+                                <button type="button" class="remove-item" onclick="removeCartItem('@item.Id')">×</button>
+
+                                <div class="item-name">@product.Name</div>
+                                <div class="item-options">
+                                    Цвет: @product.Category.Name<br />
+                                    Размер: @item.Size.Label<br />
+                                    В наличии: много
+                                </div>
+
+                                <div class="item-quantity">
+                                    <button type="button" class="quantity-btn"
+                                            onclick="changeQuantity('@item.ProductId', '@item.SizeId', @item.Quantity, -1)">−</button>
+
+                                    <span class="quantity-value">@item.Quantity</span>
+
+                                    <button type="button" class="quantity-btn"
+                                            onclick="changeQuantity('@item.ProductId', '@item.SizeId', @item.Quantity, 1)">+</button>
+
+                                    <div class="item-price">@price.ToString("N0") BYN x @item.Quantity</div>
+                                </div>
+                            </div>
                         </div>
                         }
+                    </div>
 
-                        <div class="form-group">
-                            <div class="form-row">
-                                <input type="text"
-                                       class="form-input"
-                                       id="firstName"
-                                       placeholder="Имя *"
-                                       required>
-                                <input type="text"
-                                       class="form-input"
-                                       id="lastName"
-                                       placeholder="Фамилия *"
-                                       required>
-                            </div>
+                    <div style="border-top: 2px solid #000; padding-top: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: 400; margin-bottom: 30px;">
+                            <span>ИТОГО:</span>
+                            <span id="orderTotal">
+                                    @totalPrice.ToString("N0") BYN
+                                </span>
                         </div>
 
-                        <div class="form-group">
-                            <div class="phone-input-group">
-                                <select class="form-select phone-prefix">
-                                    <option value="+375">+375</option>
-                                </select>
-                                <input type="tel"
-                                       class="form-input phone-number"
-                                       id="phoneNumber"
-                                       placeholder="Телефон *"
-                                       required>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <input type="email"
-                                   class="form-input"
-                                   id="email"
-                                   placeholder="Email *"
-                                   required>
-                        </div>
-
-                        <div class="form-group">
-                            <textarea class="form-textarea"
-                                      id="comments"
-                                      placeholder="Комментарии"></textarea>
-                        </div>
+                        <button type="submit" class="create-order-btn" id="createOrderBtn">
+                            Оформить заказ
+                        </button>
                     </div>
                 </div>
             </div>
-
-            <div class="order-summary">
-                <div style="margin-bottom: 30px;">
-                    <div style="display: flex; align-items: center; margin-bottom: 20px;">
-                        <div class="section-number">3</div>
-                        <div class="section-title" style="margin-left: 15px;">Состав заказа</div>
-                    </div>
-
-                    @foreach (var item in Model.CartItems)
-                    {
-                    var product = item.Product;
-                    var image = product.Images.FirstOrDefault()?.Image ?? "";
-                    var format = product.Images.FirstOrDefault()?.Format ?? "jpeg";
-
-                    var base64Src = string.IsNullOrWhiteSpace(image)
-                    ? "/images/no-image_0.jpg"
-                    : $"data:image/{format};base64,{image}";
-
-                    var price = product.DiscountPrice ?? product.Price;
-
-                    <div class="cart-item">
-                        <img src="@base64Src" alt="@product.Name" class="item-image"/>
-
-                        <div class="item-details">
-                            <button class="remove-item" onclick="removeCartItem('@item.Id')">×</button>
-
-                            <div class="item-name">@product.Name</div>
-                            <div class="item-options">
-                                Цвет: @product.Category.Name<br />
-                                Размер: @item.Size.Label<br />
-                                В наличии: много
-                            </div>
-
-                            <div class="item-quantity">
-                                <button class="quantity-btn"
-                                        onclick="changeQuantity('@item.ProductId', '@item.SizeId', @item.Quantity, -1)">−</button>
-
-                                <span class="quantity-value">@item.Quantity</span>
-
-                                <button class="quantity-btn"
-                                        onclick="changeQuantity('@item.ProductId', '@item.SizeId', @item.Quantity, 1)">+</button>
-
-                                <div class="item-price">@price.ToString("N0") BYN x @item.Quantity</div>
-                            </div>
-                        </div>
-                    </div>
-                    }
-                </div>
-
-                <div style="border-top: 2px solid #000; padding-top: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: 400;">
-                        <span>ИТОГО:</span>
-                        <span id="orderTotal">
-                            @totalPrice.ToString("N0") BYN
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </form>
+        }
     </div>
 </main>
 
@@ -532,6 +672,9 @@ Layout = "_Layout";
 
         // Валидация формы
         setupFormValidation();
+
+        // Обработка отправки формы
+        setupFormSubmission();
     });
 
     function fillFormWithProfile() {
@@ -629,6 +772,7 @@ Layout = "_Layout";
             field.addEventListener('input', function() {
                 if (this.hasAttribute('required') && this.value.trim()) {
                     this.style.borderColor = '#28a745';
+                    this.classList.remove('error');
                 } else if (this.hasAttribute('required')) {
                     this.style.borderColor = '#e5e5e5';
                 }
@@ -644,8 +788,10 @@ Layout = "_Layout";
             field.addEventListener('blur', function() {
                 if (this.hasAttribute('required') && !this.value.trim()) {
                     this.style.borderColor = '#ff4444';
+                    this.classList.add('error');
                 } else if (this.value.trim()) {
                     this.style.borderColor = '#e5e5e5';
+                    this.classList.remove('error');
                 }
             });
 
@@ -654,6 +800,33 @@ Layout = "_Layout";
                 field.dataset.originalValue = field.value;
             }
         });
+    }
+
+    function setupFormSubmission() {
+        const form = document.getElementById('orderForm');
+        const submitBtn = document.getElementById('createOrderBtn');
+
+        if (form && submitBtn) {
+            form.addEventListener('submit', function(e) {
+                // Подготавливаем номер телефона для отправки
+                const phoneField = document.getElementById('phoneNumber');
+                if (phoneField && phoneField.value) {
+                    let phoneValue = phoneField.value.replace(/\D/g, '');
+                    if (phoneValue.length === 9) {
+                        phoneField.value = `+375${phoneValue}`;
+                    } else if (phoneValue.startsWith('375') && phoneValue.length === 12) {
+                        phoneField.value = `+${phoneValue}`;
+                    }
+                }
+
+                // Блокируем кнопку для предотвращения повторной отправки
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Оформление заказа...';
+                submitBtn.style.opacity = '0.7';
+
+                console.log('Отправка формы заказа...');
+            });
+        }
     }
 
     function changeQuantity(productId, sizeId, currentQuantity, delta) {
@@ -686,6 +859,8 @@ Layout = "_Layout";
             opt.classList.remove('active');
         });
         element.classList.add('active');
+
+        document.getElementById('deliveryType').value = type;
         console.log('Selected delivery type:', type);
     }
 
@@ -702,9 +877,11 @@ Layout = "_Layout";
         requiredFields.forEach(field => {
             if (!field.value.trim()) {
                 field.style.borderColor = '#ff4444';
+                field.classList.add('error');
                 isValid = false;
             } else {
                 field.style.borderColor = '#e5e5e5';
+                field.classList.remove('error');
             }
         });
 

@@ -1,0 +1,440 @@
+@model GalleryVelvet.Domain.Entities.OrderEntity
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Заказ оформлен";
+    var totalAmount = Model.OrderItems.Sum(oi => (oi.Product.DiscountPrice ?? oi.Product.Price) * oi.Quantity);
+}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .success-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 60px 20px;
+        text-align: center;
+        min-height: calc(100vh - 140px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .success-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 40px;
+        background: #28a745;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        color: white;
+        animation: checkmark 0.6s ease-in-out;
+    }
+
+    @@keyframes checkmark {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.2);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .success-title {
+        font-size: 32px;
+        font-weight: 300;
+        color: #000;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        animation: fadeInUp 0.8s ease-out 0.2s both;
+    }
+
+    .success-subtitle {
+        font-size: 18px;
+        color: #666;
+        margin-bottom: 40px;
+        line-height: 1.6;
+        animation: fadeInUp 0.8s ease-out 0.4s both;
+    }
+
+    .order-details {
+        background: #fff;
+        border: 2px solid #000;
+        padding: 40px;
+        margin: 40px 0;
+        text-align: left;
+        animation: fadeInUp 0.8s ease-out 0.6s both;
+    }
+
+    .order-header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    .order-number {
+        font-size: 24px;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .order-date {
+        font-size: 14px;
+        color: #666;
+        font-weight: 400;
+    }
+
+    .order-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+
+    .info-section {
+        padding: 20px;
+        background: #f8f9fa;
+        border: 1px solid #e5e5e5;
+    }
+
+    .info-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-text {
+        font-size: 14px;
+        color: #333;
+        line-height: 1.5;
+        margin-bottom: 8px;
+    }
+
+    .order-items {
+        margin-top: 30px;
+    }
+
+    .items-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #000;
+        padding-bottom: 10px;
+    }
+
+    .order-item {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        padding: 20px 0;
+        border-bottom: 1px solid #e5e5e5;
+    }
+
+    .order-item:last-child {
+        border-bottom: none;
+    }
+
+    .item-image {
+        width: 80px;
+        height: 100px;
+        object-fit: cover;
+        flex-shrink: 0;
+        border: 1px solid #e5e5e5;
+    }
+
+    .item-details {
+        flex: 1;
+    }
+
+    .item-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #000;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .item-options {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+
+    .item-price {
+        font-size: 16px;
+        font-weight: 600;
+        color: #000;
+        text-align: right;
+    }
+
+    .order-total {
+        text-align: right;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 2px solid #000;
+    }
+
+    .total-label {
+        font-size: 20px;
+        font-weight: 600;
+        color: #000;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .total-amount {
+        font-size: 28px;
+        font-weight: 700;
+        color: #000;
+        margin-top: 10px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        margin-top: 40px;
+        animation: fadeInUp 0.8s ease-out 0.8s both;
+    }
+
+    .btn {
+        padding: 15px 30px;
+        font-size: 14px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        text-decoration: none;
+        border: 2px solid #000;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: inline-block;
+    }
+
+    .btn-primary {
+        background: #000;
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background: transparent;
+        color: #000;
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: #000;
+    }
+
+    .btn-secondary:hover {
+        background: #000;
+        color: #fff;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 8px 16px;
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        color: #856404;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .success-container {
+            padding: 40px 15px;
+        }
+
+        .success-title {
+            font-size: 24px;
+        }
+
+        .success-subtitle {
+            font-size: 16px;
+        }
+
+        .order-details {
+            padding: 20px;
+        }
+
+        .order-info {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .order-item {
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+
+        .item-image {
+            width: 100%;
+            height: 200px;
+            max-width: 200px;
+        }
+
+        .item-price {
+            text-align: left;
+            margin-top: 10px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn {
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+        }
+    }
+</style>
+
+<main class="main-content">
+    <div class="success-container">
+        <div class="success-icon">
+            ✓
+        </div>
+
+        <h1 class="success-title">Заказ успешно оформлен!</h1>
+        <p class="success-subtitle">
+            Спасибо за ваш заказ! Мы получили вашу заявку и уже начали её обработку.<br>
+            В ближайшее время с вами свяжется наш менеджер для подтверждения заказа.
+        </p>
+
+        <div class="order-details">
+            <div class="order-header">
+                <div class="order-number">Заказ #@Model.Id.ToString("N")[..8].ToUpper()</div>
+                <div class="order-date">@Model.OrderDate.ToString("dd.MM.yyyy HH:mm")</div>
+                <div class="status-badge">@Model.OrderStatus.Name</div>
+            </div>
+
+            <div class="order-info">
+                <div class="info-section">
+                    <div class="info-title">Контактная информация</div>
+                    <div class="info-text">@Model.FirstName @Model.LastName</div>
+                    <div class="info-text">@Model.Email</div>
+                    <div class="info-text">@Model.PhoneNumber</div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-title">Детали заказа</div>
+                    <div class="info-text">Товаров: @Model.OrderItems.Count шт.</div>
+                    <div class="info-text">Общая сумма: @totalAmount.ToString("N0") BYN</div>
+                    <div class="info-text">Дата: @Model.OrderDate.ToString("dd.MM.yyyy")</div>
+                </div>
+            </div>
+
+            <div class="order-items">
+                <div class="items-title">Состав заказа</div>
+
+                @foreach (var item in Model.OrderItems)
+                {
+                    var product = item.Product;
+                    var image = product.Images.FirstOrDefault()?.Image ?? "";
+                    var format = product.Images.FirstOrDefault()?.Format ?? "jpeg";
+
+                    var base64Src = string.IsNullOrWhiteSpace(image)
+                        ? "/images/no-image_0.jpg"
+                        : $"data:image/{format};base64,{image}";
+
+                    var price = product.DiscountPrice ?? product.Price;
+                    var itemTotal = price * item.Quantity;
+
+                    <div class="order-item">
+                        <img src="@base64Src" alt="@product.Name" class="item-image"/>
+
+                        <div class="item-details">
+                            <div class="item-name">@product.Name</div>
+                            <div class="item-options">
+                                Размер: @item.Size.Label<br/>
+                                Количество: @item.Quantity шт.<br/>
+                                Цена: @price.ToString("N0") BYN
+                            </div>
+                        </div>
+
+                        <div class="item-price">
+                            @itemTotal.ToString("N0") BYN
+                        </div>
+                    </div>
+                }
+
+                <div class="order-total">
+                    <div class="total-label">Итого к оплате:</div>
+                    <div class="total-amount">@totalAmount.ToString("N0") BYN</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="@Url.Action("Index", "User", new { tab = "orders" })" class="btn btn-primary">
+                Мои заказы
+            </a>
+            <a href="@Url.Action("Index", "Product")" class="btn btn-secondary">
+                Продолжить покупки
+            </a>
+        </div>
+    </div>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Показываем уведомление через 2 секунды
+        setTimeout(() => {
+            console.log('Заказ успешно создан!');
+            
+            // Можно добавить дополнительные действия, например:
+            // - Отправка события в аналитику
+            // - Показ дополнительных предложений
+            // - Автоматическое перенаправление через некоторое время
+        }, 2000);
+
+        // Анимация появления элементов
+        const animatedElements = document.querySelectorAll('[style*="animation"]');
+        animatedElements.forEach((element, index) => {
+            element.style.animationDelay = `${index * 0.2}s`;
+        });
+    });
+</script>
