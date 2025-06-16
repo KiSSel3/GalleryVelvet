@@ -11,6 +11,9 @@ public sealed class CreateProductDto
     [StringLength(1000, ErrorMessage = "Описание не может быть длиннее 1000 символов")]
     public string? Description { get; set; }
 
+    [StringLength(1000, ErrorMessage = "Состав и уход не может быть длиннее 1000 символов")]
+    public string? CompositionAndCare { get; set; }
+    
     [Required(ErrorMessage = "Цена обязательна")]
     [Range(0.01, double.MaxValue, ErrorMessage = "Цена должна быть больше 0")]
     public required decimal Price { get; set; }

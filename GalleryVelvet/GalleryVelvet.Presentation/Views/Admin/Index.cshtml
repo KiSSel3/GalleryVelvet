@@ -18,12 +18,6 @@
         --admin-radius: 8px;
     }
 
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
     .admin-container {
         min-height: calc(100vh - 70px);
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -56,6 +50,7 @@
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 30px;
+        margin-bottom: 40px;
     }
 
     .admin-card {
@@ -65,6 +60,9 @@
         overflow: hidden;
         transition: all 0.3s ease;
         position: relative;
+        display: flex;
+        flex-direction: column;
+        height: auto;
     }
 
     .admin-card:hover {
@@ -86,6 +84,7 @@
         padding: 30px 30px 20px;
         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
         border-bottom: 1px solid var(--admin-border);
+        flex-grow: 0;
     }
 
     .admin-card-icon {
@@ -118,12 +117,25 @@
     }
 
     .admin-card-body {
-        padding: 30px;
+        padding: 20px 30px 30px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
     }
 
     .admin-card-actions {
         display: flex;
         gap: 10px;
+        width: 100%;
+    }
+
+    .admin-card-actions.single-action {
+        justify-content: center;
+    }
+
+    .admin-card-actions.two-actions {
+        justify-content: space-between;
     }
 
     .admin-btn {
@@ -143,6 +155,9 @@
         align-items: center;
         justify-content: center;
         gap: 8px;
+        white-space: nowrap;
+        min-height: 48px;
+        box-sizing: border-box;
     }
 
     .admin-btn-primary {
@@ -173,28 +188,40 @@
         text-decoration: none;
     }
 
+    .admin-btn-success {
+        background: linear-gradient(135deg, var(--admin-success), #229954);
+        color: white;
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+    }
+
+    .admin-btn-success:hover {
+        background: linear-gradient(135deg, #229954, var(--admin-success));
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
     .admin-quick-actions {
         background: white;
         border-radius: var(--admin-radius);
         box-shadow: var(--admin-shadow);
         padding: 30px;
-        margin-top: 40px;
         max-width: 1200px;
-        margin-left: auto;
-        margin-right: auto;
+        margin: 0 auto;
     }
 
     .quick-actions-title {
         font-size: 24px;
         font-weight: 600;
         color: var(--admin-primary);
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         text-align: center;
     }
 
     .quick-actions-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 15px;
     }
 
@@ -212,6 +239,8 @@
         align-items: center;
         justify-content: center;
         gap: 10px;
+        min-height: 56px;
+        box-sizing: border-box;
     }
 
     .quick-action-btn:hover {
@@ -225,34 +254,7 @@
 
     .admin-icon {
         font-size: 18px;
-    }
-
-    @@media (max-width: 768px) {
-        .admin-container {
-            padding: 20px 15px;
-        }
-
-        .admin-title {
-            font-size: 36px;
-        }
-
-        .admin-grid {
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        .admin-card-header,
-        .admin-card-body {
-            padding: 20px;
-        }
-
-        .admin-card-actions {
-            flex-direction: column;
-        }
-
-        .quick-actions-grid {
-            grid-template-columns: 1fr;
-        }
+        flex-shrink: 0;
     }
 
     .fade-in {
@@ -268,6 +270,84 @@
             opacity: 1;
             transform: translateY(0);
         }
+    }
+
+    .ripple {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        pointer-events: none;
+        animation: rippleEffect 0.6s ease-out;
+    }
+
+    @@keyframes rippleEffect {
+        to {
+            transform: scale(2);
+            opacity: 0;
+        }
+    }
+
+    @@media (max-width: 768px) {
+    .admin-container {
+        padding: 20px 15px;
+    }
+
+    .admin-title {
+        font-size: 36px;
+    }
+
+    .admin-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .admin-card-header,
+    .admin-card-body {
+        padding: 20px;
+    }
+
+    .admin-card-actions {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .admin-card-actions.single-action,
+    .admin-card-actions.two-actions {
+        justify-content: stretch;
+    }
+
+    .quick-actions-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-btn {
+        min-height: 44px;
+        font-size: 13px;
+    }
+
+    .quick-action-btn {
+        min-height: 50px;
+        font-size: 14px;
+    }
+    }
+
+    @@media (max-width: 480px) {
+    .admin-header {
+        margin-bottom: 30px;
+    }
+
+    .admin-title {
+        font-size: 28px;
+        letter-spacing: 1px;
+    }
+
+    .admin-subtitle {
+        font-size: 16px;
+    }
+
+    .quick-actions-title {
+        font-size: 20px;
+    }
     }
 </style>
 
@@ -289,10 +369,10 @@
                 </p>
             </div>
             <div class="admin-card-body">
-                <div class="admin-card-actions">
+                <div class="admin-card-actions single-action">
                     <a href="@Url.Action("Orders", "Admin")" class="admin-btn admin-btn-primary">
                         <span class="admin-icon">👁️</span>
-                        Просмотр
+                        Просмотр заказов
                     </a>
                 </div>
             </div>
@@ -309,10 +389,10 @@
                 </p>
             </div>
             <div class="admin-card-body">
-                <div class="admin-card-actions">
+                <div class="admin-card-actions single-action">
                     <a href="@Url.Action("Users", "Admin")" class="admin-btn admin-btn-primary">
                         <span class="admin-icon">👁️</span>
-                        Просмотр
+                        Просмотр пользователей
                     </a>
                 </div>
             </div>
@@ -321,28 +401,44 @@
         <div class="admin-card fade-in" style="animation-delay: 0.3s;">
             <div class="admin-card-header">
                 <div class="admin-card-icon">
-                    🏷️
+                    📂
                 </div>
-                <h3 class="admin-card-title">Категории и теги</h3>
+                <h3 class="admin-card-title">Управление категориями</h3>
                 <p class="admin-card-description">
-                    Создание и редактирование категорий товаров и тегов
+                    Создание и редактирование категорий товаров в каталоге
                 </p>
             </div>
             <div class="admin-card-body">
-                <div class="admin-card-actions">
+                <div class="admin-card-actions single-action">
                     <a href="@Url.Action("Categories", "Admin")" class="admin-btn admin-btn-primary">
                         <span class="admin-icon">📂</span>
-                        Категории
-                    </a>
-                    <a href="@Url.Action("Tags", "Admin")" class="admin-btn admin-btn-secondary">
-                        <span class="admin-icon">🏷️</span>
-                        Теги
+                        Управление категориями
                     </a>
                 </div>
             </div>
         </div>
 
         <div class="admin-card fade-in" style="animation-delay: 0.4s;">
+            <div class="admin-card-header">
+                <div class="admin-card-icon">
+                    🏷️
+                </div>
+                <h3 class="admin-card-title">Управление тегами</h3>
+                <p class="admin-card-description">
+                    Создание и редактирование тегов для товаров
+                </p>
+            </div>
+            <div class="admin-card-body">
+                <div class="admin-card-actions single-action">
+                    <a href="@Url.Action("Tags", "Admin")" class="admin-btn admin-btn-secondary">
+                        <span class="admin-icon">🏷️</span>
+                        Управление тегами
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-card fade-in" style="animation-delay: 0.5s;">
             <div class="admin-card-header">
                 <div class="admin-card-icon">
                     🛍️
@@ -353,46 +449,42 @@
                 </p>
             </div>
             <div class="admin-card-body">
-                <div class="admin-card-actions">
+                <div class="admin-card-actions single-action">
                     <a href="@Url.Action("Products", "Admin")" class="admin-btn admin-btn-primary">
                         <span class="admin-icon">👁️</span>
-                        Просмотр
-                    </a>
-                    <a href="@Url.Action("CreateProduct", "Admin")" class="admin-btn admin-btn-secondary">
-                        <span class="admin-icon">➕</span>
-                        Создать
+                        Управление товарами
                     </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="admin-quick-actions fade-in" style="animation-delay: 0.5s;">
+    <div class="admin-quick-actions fade-in" style="animation-delay: 0.6s;">
         <h3 class="quick-actions-title">Быстрые действия</h3>
         <div class="quick-actions-grid">
             <a href="@Url.Action("CreateCategory", "Admin")" class="quick-action-btn">
                 <span class="admin-icon">📂</span>
-                Новая категория
+                <span>Новая категория</span>
             </a>
             <a href="@Url.Action("CreateTag", "Admin")" class="quick-action-btn">
                 <span class="admin-icon">🏷️</span>
-                Новый тег
+                <span>Новый тег</span>
             </a>
             <a href="@Url.Action("CreateProduct", "Admin")" class="quick-action-btn">
                 <span class="admin-icon">🛍️</span>
-                Новый товар
+                <span>Новый товар</span>
             </a>
             <a href="@Url.Action("Orders", "Admin")" class="quick-action-btn">
                 <span class="admin-icon">📦</span>
-                Последние заказы
+                <span>Последние заказы</span>
             </a>
             <a href="@Url.Action("Users", "Admin")" class="quick-action-btn">
                 <span class="admin-icon">👥</span>
-                Новые пользователи
+                <span>Управление пользователями</span>
             </a>
             <a href="@Url.Action("Products", "Admin", new { includeDeleted = true })" class="quick-action-btn">
                 <span class="admin-icon">🗑️</span>
-                Удаленные товары
+                <span>Удаленные товары</span>
             </a>
         </div>
     </div>
@@ -404,7 +496,7 @@
         cards.forEach((card, index) => {
             card.style.animationDelay = `${index * 0.1}s`;
         });
-        
+
         const adminCards = document.querySelectorAll('.admin-card');
         adminCards.forEach(card => {
             card.addEventListener('mouseenter', function() {
@@ -415,7 +507,7 @@
                 this.style.transform = 'translateY(0) scale(1)';
             });
         });
-        
+
         const buttons = document.querySelectorAll('.admin-btn, .quick-action-btn');
         buttons.forEach(button => {
             button.addEventListener('click', function(e) {
@@ -424,14 +516,14 @@
                 const size = Math.max(rect.width, rect.height);
                 const x = e.clientX - rect.left - size / 2;
                 const y = e.clientY - rect.top - size / 2;
-                
+
                 ripple.style.width = ripple.style.height = size + 'px';
                 ripple.style.left = x + 'px';
                 ripple.style.top = y + 'px';
                 ripple.classList.add('ripple');
-                
+
                 this.appendChild(ripple);
-                
+
                 setTimeout(() => {
                     ripple.remove();
                 }, 600);
@@ -441,20 +533,3 @@
         console.log('Панель администратора загружена');
     });
 </script>
-
-<style>
-    .ripple {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
-        pointer-events: none;
-        animation: rippleEffect 0.6s ease-out;
-    }
-
-    @@keyframes rippleEffect {
-        to {
-            transform: scale(2);
-            opacity: 0;
-        }
-    }
-</style>

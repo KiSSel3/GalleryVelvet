@@ -1,8 +1,9 @@
-@model GalleryVelvet.Presentation.Models.Admin.CreateProductRequestViewModel
+@model GalleryVelvet.Presentation.Models.Admin.EditProductRequestViewModel
 
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Создание товара";
+    ViewData["Title"] = "Редактирование товара";
+    var productId = ViewData["ProductId"];
 }
 
 <style>
@@ -140,6 +141,53 @@
         margin: 0;
     }
 
+    .existing-images {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .existing-image {
+        position: relative;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        overflow: hidden;
+        background: white;
+    }
+
+    .existing-image img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+    }
+
+    .image-actions {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        display: flex;
+        gap: 5px;
+    }
+
+    .delete-image-btn {
+        width: 25px;
+        height: 25px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .delete-image-btn:hover {
+        background: #c0392b;
+    }
+
     .file-upload {
         border: 2px dashed #3498db;
         border-radius: 8px;
@@ -242,34 +290,57 @@
         color: #721c24;
     }
 
+    .image-to-delete {
+        opacity: 0.5;
+        position: relative;
+    }
+
+    .image-to-delete::after {
+        content: "УДАЛЕНО";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(231, 76, 60, 0.9);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
     @@media (max-width: 768px) {
-    .admin-page {
-        padding: 20px 15px;
-    }
+        .admin-page {
+            padding: 20px 15px;
+        }
 
-    .form-grid {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
 
-    .form-actions {
-        flex-direction: column;
-    }
+        .form-actions {
+            flex-direction: column;
+        }
 
-    .checkbox-group {
-        grid-template-columns: 1fr;
-    }
+        .checkbox-group {
+            grid-template-columns: 1fr;
+        }
+
+        .existing-images {
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        }
     }
 </style>
 
 <main class="admin-page">
     <div class="admin-header">
         <div>
-            <h1 class="admin-title">Создание товара</h1>
+            <h1 class="admin-title">Редактирование товара</h1>
             <div class="admin-breadcrumb">
-                <a href="@Url.Action("Index", "Admin")">Главная</a> /
-                <a href="@Url.Action("Products", "Admin")">Товары</a> /
-                Создание
+                <a href="@Url.Action("Index", "Admin")">Главная</a> / 
+                <a href="@Url.Action("Products", "Admin")">Товары</a> / 
+                Редактирование
             </div>
         </div>
     </div>
@@ -286,11 +357,11 @@
         </div>
     }
 
-    <form asp-action="CreateProduct" method="post" enctype="multipart/form-data" class="product-form">
+    <form asp-action="EditProduct" asp-route-id="@productId" method="post" enctype="multipart/form-data" class="product-form">
         @Html.AntiForgeryToken()
-
+        
         <div class="form-header">
-            🛍️ Информация о товаре
+            ✏️ Редактирование товара
         </div>
 
         <div class="form-body">
@@ -307,7 +378,7 @@
                         <option value="">Выберите категорию</option>
                         @foreach (var category in ViewBag.Categories)
                         {
-                            <option value="@category.Id">@category.Name</option>
+                            <option value="@category.Id" selected="@(Model.CategoryId == category.Id)">@category.Name</option>
                         }
                     </select>
                     <span asp-validation-for="CategoryId" class="validation-error"></span>
@@ -327,14 +398,14 @@
 
                 <div class="form-group form-group-full">
                     <label asp-for="Description" class="form-label">Описание</label>
-                    <textarea asp-for="Description" class="form-input form-textarea"
+                    <textarea asp-for="Description" class="form-input form-textarea" 
                               placeholder="Введите описание товара..."></textarea>
                     <span asp-validation-for="Description" class="validation-error"></span>
                 </div>
 
                 <div class="form-group form-group-full">
                     <label asp-for="CompositionAndCare" class="form-label">Состав и уход</label>
-                    <textarea asp-for="CompositionAndCare" class="form-input form-textarea"
+                    <textarea asp-for="CompositionAndCare" class="form-input form-textarea" 
                               placeholder="Укажите состав ткани и рекомендации по уходу..."></textarea>
                     <span asp-validation-for="CompositionAndCare" class="validation-error"></span>
                 </div>
@@ -344,8 +415,10 @@
                     <div class="checkbox-group">
                         @foreach (var tag in ViewBag.Tags)
                         {
+                            var isChecked = Model.TagIds?.Contains(tag.Id) ?? false;
                             <div class="checkbox-item">
-                                <input type="checkbox" name="TagIds" value="@tag.Id" id="tag_@tag.Id">
+                                <input type="checkbox" name="TagIds" value="@tag.Id" id="tag_@tag.Id" 
+                                       @(isChecked ? "checked" : "")>
                                 <label for="tag_@tag.Id">@tag.Name</label>
                             </div>
                         }
@@ -357,8 +430,10 @@
                     <div class="checkbox-group">
                         @foreach (var size in ViewBag.Sizes)
                         {
+                            var isChecked = Model.SizeIds?.Contains(size.Id) ?? false;
                             <div class="checkbox-item">
-                                <input type="checkbox" name="SizeIds" value="@size.Id" id="size_@size.Id">
+                                <input type="checkbox" name="SizeIds" value="@size.Id" id="size_@size.Id" 
+                                       @(isChecked ? "checked" : "")>
                                 <label for="size_@size.Id">@size.Label</label>
                             </div>
                         }
@@ -367,10 +442,35 @@
 
                 <div class="form-group form-group-full">
                     <label class="form-label">Изображения товара</label>
+                    
+                    @if (Model.ExistingImages != null && Model.ExistingImages.Any())
+                    {
+                        <div class="existing-images">
+                            @for (int i = 0; i < Model.ExistingImages.Count; i++)
+                            {
+                                var image = Model.ExistingImages[i];
+                                var base64Src = $"data:image/{image.Format};base64,{image.Image}";
+                                
+                                <div class="existing-image" data-image-id="@image.Id">
+                                    <img src="@base64Src" alt="Изображение товара" />
+                                    <div class="image-actions">
+                                        <button type="button" class="delete-image-btn" onclick="toggleImageDelete('@image.Id')">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                    
+                                    <input type="hidden" name="ExistingImages[@i].Id" value="@image.Id" />
+                                    <input type="hidden" name="ExistingImages[@i].Image" value="@image.Image" />
+                                    <input type="hidden" name="ExistingImages[@i].Format" value="@image.Format" />
+                                </div>
+                            }
+                        </div>
+                    }
+                    
                     <div class="file-upload">
                         <div class="file-upload-icon">📸</div>
                         <div class="file-upload-text">
-                            Выберите изображения товара<br>
+                            Добавить новые изображения<br>
                             <small>Поддерживаются форматы: JPG, PNG, GIF, WebP</small>
                         </div>
                         <input asp-for="Images" type="file" multiple accept="image/*" class="file-input" id="imageInput">
@@ -387,7 +487,7 @@
                     ← Отмена
                 </a>
                 <button type="submit" class="btn btn-primary">
-                    💾 Создать товар
+                    💾 Сохранить изменения
                 </button>
             </div>
         </div>
@@ -395,36 +495,67 @@
 </main>
 
 <script>
+    const imagesToDelete = [];
+
+    function toggleImageDelete(imageId) {
+        const imageElement = document.querySelector(`[data-image-id="${imageId}"]`);
+        
+        if (imagesToDelete.includes(imageId)) {
+            const index = imagesToDelete.indexOf(imageId);
+            imagesToDelete.splice(index, 1);
+            imageElement.classList.remove('image-to-delete');
+        } else {
+            imagesToDelete.push(imageId);
+            imageElement.classList.add('image-to-delete');
+        }
+        
+        updateImagesToDeleteInput();
+    }
+
+    function updateImagesToDeleteInput() {
+        const existingInputs = document.querySelectorAll('input[name="ImagesToDelete"]');
+        existingInputs.forEach(input => input.remove());
+        
+        const form = document.querySelector('.product-form');
+        imagesToDelete.forEach(imageId => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'ImagesToDelete';
+            input.value = imageId;
+            form.appendChild(input);
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const fileInput = document.getElementById('imageInput');
         const fileUpload = document.querySelector('.file-upload');
-
+        
         fileInput.addEventListener('change', function() {
             const files = this.files;
             if (files.length > 0) {
                 const fileText = document.querySelector('.file-upload-text');
                 if (files.length === 1) {
-                    fileText.innerHTML = `Выбран файл: ${files[0].name}`;
+                    fileText.innerHTML = `Выбран новый файл: ${files[0].name}`;
                 } else {
-                    fileText.innerHTML = `Выбрано файлов: ${files.length}`;
+                    fileText.innerHTML = `Выбрано новых файлов: ${files.length}`;
                 }
             }
         });
-
+        
         fileUpload.addEventListener('dragover', function(e) {
             e.preventDefault();
             this.style.backgroundColor = '#e3f2fd';
         });
-
+        
         fileUpload.addEventListener('dragleave', function(e) {
             e.preventDefault();
             this.style.backgroundColor = '#f8f9fa';
         });
-
+        
         fileUpload.addEventListener('drop', function(e) {
             e.preventDefault();
             this.style.backgroundColor = '#f8f9fa';
-
+            
             const files = e.dataTransfer.files;
             if (files.length > 0) {
                 fileInput.files = files;
@@ -433,6 +564,6 @@
             }
         });
 
-        console.log('Страница создания товара загружена');
+        console.log('Страница редактирования товара загружена');
     });
 </script>

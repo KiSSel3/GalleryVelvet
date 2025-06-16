@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GalleryVelvet.Presentation.Controllers;
 
-//[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin")]
 [Route("Admin")]
 public sealed class AdminController(IAdminService adminService) : Controller
 {
@@ -81,12 +81,13 @@ public sealed class AdminController(IAdminService adminService) : Controller
 
     [HttpPost("Orders/{id:guid}/UpdateStatus")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> UpdateOrderStatus(Guid id, UpdateOrderStatusDto dto, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> UpdateOrderStatus(Guid id, UpdateOrderStatusDto dto,
+        CancellationToken cancellationToken = default)
     {
         try
         {
             var success = await adminService.UpdateOrderStatusAsync(id, dto.StatusId, cancellationToken);
-            
+
             if (success)
             {
                 TempData["Success"] = "Статус заказа успешно обновлен";
@@ -161,12 +162,13 @@ public sealed class AdminController(IAdminService adminService) : Controller
 
     [HttpPost("Users/{id:guid}/UpdateRoles")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> UpdateUserRoles(Guid id, UpdateUserRolesDto dto, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> UpdateUserRoles(Guid id, UpdateUserRolesDto dto,
+        CancellationToken cancellationToken = default)
     {
         try
         {
             var success = await adminService.UpdateUserRolesAsync(id, dto.RoleIds, cancellationToken);
-            
+
             if (success)
             {
                 TempData["Success"] = "Роли пользователя успешно обновлены";
@@ -198,7 +200,8 @@ public sealed class AdminController(IAdminService adminService) : Controller
     {
         try
         {
-            var categories = await adminService.GetPagedCategoriesAsync(pageNumber, pageSize, searchTerm, cancellationToken);
+            var categories =
+                await adminService.GetPagedCategoriesAsync(pageNumber, pageSize, searchTerm, cancellationToken);
 
             var viewModel = new CategoriesAdminViewModel
             {
@@ -222,7 +225,8 @@ public sealed class AdminController(IAdminService adminService) : Controller
 
     [HttpPost("Categories/Create")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CreateCategory(CreateCategoryDto dto, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> CreateCategory(CreateCategoryDto dto,
+        CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
         {
@@ -249,7 +253,7 @@ public sealed class AdminController(IAdminService adminService) : Controller
         {
             var categories = await adminService.GetPagedCategoriesAsync(1, 100, cancellationToken: cancellationToken);
             var category = categories.FirstOrDefault(c => c.Id == id);
-            
+
             if (category == null) return NotFound();
 
             var dto = category.Adapt<UpdateCategoryDto>();
@@ -264,7 +268,8 @@ public sealed class AdminController(IAdminService adminService) : Controller
 
     [HttpPost("Categories/{id:guid}/Edit")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> EditCategory(Guid id, UpdateCategoryDto dto, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> EditCategory(Guid id, UpdateCategoryDto dto,
+        CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
         {
@@ -275,7 +280,7 @@ public sealed class AdminController(IAdminService adminService) : Controller
         try
         {
             var category = await adminService.UpdateCategoryAsync(id, dto, cancellationToken);
-            
+
             if (category != null)
             {
                 TempData["Success"] = "Категория успешно обновлена";
@@ -377,7 +382,7 @@ public sealed class AdminController(IAdminService adminService) : Controller
         {
             var tags = await adminService.GetPagedTagsAsync(1, 100, cancellationToken: cancellationToken);
             var tag = tags.FirstOrDefault(t => t.Id == id);
-            
+
             if (tag == null) return NotFound();
 
             var dto = tag.Adapt<UpdateTagDto>();
@@ -403,7 +408,7 @@ public sealed class AdminController(IAdminService adminService) : Controller
         try
         {
             var tag = await adminService.UpdateTagAsync(id, dto, cancellationToken);
-            
+
             if (tag != null)
             {
                 TempData["Success"] = "Тег успешно обновлен";
@@ -548,6 +553,7 @@ public sealed class AdminController(IAdminService adminService) : Controller
             {
                 Name = model.Name,
                 Description = model.Description,
+                CompositionAndCare = model.CompositionAndCare,
                 Price = model.Price,
                 DiscountPrice = model.DiscountPrice,
                 CategoryId = model.CategoryId,
@@ -563,7 +569,7 @@ public sealed class AdminController(IAdminService adminService) : Controller
         catch (Exception ex)
         {
             ModelState.AddModelError("", ex.Message);
-            await PopulateCreateProductViewData( cancellationToken);
+            await PopulateCreateProductViewData(cancellationToken);
             return View(model);
         }
     }
@@ -571,7 +577,8 @@ public sealed class AdminController(IAdminService adminService) : Controller
 
     [HttpPost("Products/{id:guid}/Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteProduct(Guid id, bool hardDelete = false, CancellationToken cancellationToken = default)
+    public async Task<IActionResult> DeleteProduct(Guid id, bool hardDelete = false,
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -603,8 +610,165 @@ public sealed class AdminController(IAdminService adminService) : Controller
         return RedirectToAction("Products");
     }
 
+    [HttpGet("Products/{id:guid}/Edit")]
+    public async Task<IActionResult> EditProduct(Guid id, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var products = await adminService.GetPagedProductsForAdminAsync(1, 1000, includeDeleted: true,
+                cancellationToken: cancellationToken);
+            var product = products.FirstOrDefault(p => p.Id == id);
+
+            if (product == null) return NotFound();
+
+            var categories = await adminService.GetAllCategoriesAsync(cancellationToken);
+            var tags = await adminService.GetAllTagsAsync(cancellationToken);
+            var sizes = await adminService.GetAllSizesAsync(cancellationToken);
+
+            var model = new EditProductRequestViewModel
+            {
+                Name = product.Name,
+                Description = product.Description,
+                CompositionAndCare = product.CompositionAndCare,
+                Price = product.Price,
+                DiscountPrice = product.DiscountPrice,
+                CategoryId = product.CategoryId,
+                TagIds = product.ProductTags?.Select(pt => pt.TagId).ToList() ?? new List<Guid>(),
+                SizeIds = product.ProductSizes?.Select(ps => ps.SizeId).ToList() ?? new List<Guid>(),
+                ExistingImages = product.Images?.Select(img => new ExistingImageViewModel
+                {
+                    Id = img.Id,
+                    Image = img.Image,
+                    Format = img.Format
+                }).ToList() ?? []
+            };
+
+            ViewBag.Categories = categories;
+            ViewBag.Tags = tags;
+            ViewBag.Sizes = sizes;
+            ViewData["ProductId"] = id;
+
+            return View(model);
+        }
+        catch (Exception ex)
+        {
+            return View("Error", new ErrorViewModel { RequestId = ex.Message });
+        }
+    }
+
+    [HttpPost("Products/{id:guid}/Edit")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> EditProduct(
+        Guid id,
+        EditProductRequestViewModel model,
+        CancellationToken cancellationToken = default)
+    {
+        if (!ModelState.IsValid)
+        {
+            await PopulateEditProductViewData(id, cancellationToken);
+            return View(model);
+        }
+
+        try
+        {
+            var imagesDtos = new List<ProductImageDto>();
+            
+            if (model.ExistingImages != null)
+            {
+                var imagesToKeep = model.ExistingImages
+                    .Where(img => model.ImagesToDelete == null || !model.ImagesToDelete.Contains(img.Id))
+                    .ToList();
+
+                foreach (var existingImage in imagesToKeep)
+                {
+                    imagesDtos.Add(new ProductImageDto
+                    {
+                        Image = existingImage.Image,
+                        Format = existingImage.Format
+                    });
+                }
+            }
+            
+            if (model.Images != null && model.Images.Any())
+            {
+                foreach (var imageFile in model.Images)
+                {
+                    if (imageFile.Length > 0)
+                    {
+                        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                        var extension = Path.GetExtension(imageFile.FileName).ToLowerInvariant();
+
+                        if (!allowedExtensions.Contains(extension))
+                        {
+                            ModelState.AddModelError("Images", $"Неподдерживаемый формат файла: {extension}");
+                            await PopulateEditProductViewData(id, cancellationToken);
+                            return View(model);
+                        }
+
+                        using var memoryStream = new MemoryStream();
+                        await imageFile.CopyToAsync(memoryStream, cancellationToken);
+                        var imageBytes = memoryStream.ToArray();
+                        var base64String = Convert.ToBase64String(imageBytes);
+
+                        var mimeType = imageFile.ContentType;
+                        if (string.IsNullOrEmpty(mimeType))
+                        {
+                            mimeType = extension switch
+                            {
+                                ".jpg" or ".jpeg" => "image/jpeg",
+                                ".png" => "image/png",
+                                ".gif" => "image/gif",
+                                ".webp" => "image/webp",
+                                _ => "image/jpeg"
+                            };
+                        }
+
+                        imagesDtos.Add(new ProductImageDto
+                        {
+                            Image = base64String,
+                            Format = mimeType
+                        });
+                    }
+                }
+            }
+
+            var updateProductDto = new UpdateProductDto
+            {
+                Name = model.Name,
+                Description = model.Description,
+                CompositionAndCare = model.CompositionAndCare,
+                Price = model.Price,
+                DiscountPrice = model.DiscountPrice,
+                CategoryId = model.CategoryId,
+                TagIds = model.TagIds ?? new List<Guid>(),
+                SizeIds = model.SizeIds ?? new List<Guid>(),
+                Images = imagesDtos
+            };
+
+            var updatedProduct = await adminService.UpdateProductAsync(id, updateProductDto, cancellationToken);
+
+            if (updatedProduct != null)
+            {
+                TempData["Success"] = "Продукт успешно обновлен";
+                return RedirectToAction("Products");
+            }
+            else
+            {
+                ModelState.AddModelError("", "Продукт не найден");
+                await PopulateEditProductViewData(id, cancellationToken);
+                return View(model);
+            }
+        }
+        catch (Exception ex)
+        {
+            ModelState.AddModelError("", ex.Message);
+            await PopulateEditProductViewData(id, cancellationToken);
+            return View(model);
+        }
+    }
+
     #endregion
-    
+
     private async Task PopulateCreateProductViewData(CancellationToken cancellationToken)
     {
         var categories = await adminService.GetAllCategoriesAsync(cancellationToken);
@@ -614,5 +778,17 @@ public sealed class AdminController(IAdminService adminService) : Controller
         ViewBag.Categories = categories;
         ViewBag.Tags = tags;
         ViewBag.Sizes = sizes;
+    }
+
+    private async Task PopulateEditProductViewData(Guid productId, CancellationToken cancellationToken)
+    {
+        var categories = await adminService.GetAllCategoriesAsync(cancellationToken);
+        var tags = await adminService.GetAllTagsAsync(cancellationToken);
+        var sizes = await adminService.GetAllSizesAsync(cancellationToken);
+
+        ViewBag.Categories = categories;
+        ViewBag.Tags = tags;
+        ViewBag.Sizes = sizes;
+        ViewData["ProductId"] = productId;
     }
 }

@@ -42,7 +42,7 @@ public sealed class AdminService(
                 .Include(o => o.OrderStatus)
                 .Include(o => o.User)
                 .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product));
+                .ThenInclude(oi => oi.Product));
 
         return await PagedList<OrderEntity>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
     }
@@ -55,14 +55,15 @@ public sealed class AdminService(
                 .Include(o => o.OrderStatus)
                 .Include(o => o.User)
                 .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product)
-                        .ThenInclude(p => p.Images)
+                .ThenInclude(oi => oi.Product)
+                .ThenInclude(p => p.Images)
                 .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Size),
+                .ThenInclude(oi => oi.Size),
             cancellationToken);
     }
 
-    public async Task<bool> UpdateOrderStatusAsync(Guid orderId, Guid statusId, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateOrderStatusAsync(Guid orderId, Guid statusId,
+        CancellationToken cancellationToken = default)
     {
         var order = await orderRepository.GetByIdAsync(orderId, cancellationToken: cancellationToken);
         if (order == null) return false;
@@ -74,7 +75,7 @@ public sealed class AdminService(
         await orderRepository.UpdateAsync(order, cancellationToken);
         return true;
     }
-    
+
     public async Task<PagedList<UserEntity>> GetPagedUsersAsync(
         int pageNumber,
         int pageSize,
@@ -91,7 +92,7 @@ public sealed class AdminService(
             orderBy: q => q.OrderBy(u => u.Login),
             includeBuilder: q => q
                 .Include(u => u.UserRoles)
-                    .ThenInclude(ur => ur.Role));
+                .ThenInclude(ur => ur.Role));
 
         return await PagedList<UserEntity>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
     }
@@ -102,11 +103,12 @@ public sealed class AdminService(
             userId,
             includeBuilder: q => q
                 .Include(u => u.UserRoles)
-                    .ThenInclude(ur => ur.Role),
+                .ThenInclude(ur => ur.Role),
             cancellationToken);
     }
 
-    public async Task<bool> UpdateUserRolesAsync(Guid userId, List<Guid> roleIds, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateUserRolesAsync(Guid userId, List<Guid> roleIds,
+        CancellationToken cancellationToken = default)
     {
         var user = await userRepository.GetByIdAsync(
             userId,
@@ -114,12 +116,12 @@ public sealed class AdminService(
             cancellationToken);
 
         if (user == null) return false;
-        
+
         var roles = await roleRepository.GetQueryable(filter: r => roleIds.Contains(r.Id))
             .ToListAsync(cancellationToken);
 
         if (roles.Count != roleIds.Count) return false;
-        
+
         user.UserRoles = roleIds.Select(roleId => new UserRoleEntity
         {
             UserId = userId,
@@ -129,7 +131,7 @@ public sealed class AdminService(
         await userRepository.UpdateAsync(user, cancellationToken);
         return true;
     }
-    
+
     public async Task<PagedList<CategoryEntity>> GetPagedCategoriesAsync(
         int pageNumber,
         int pageSize,
@@ -146,7 +148,8 @@ public sealed class AdminService(
         return await PagedList<CategoryEntity>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
     }
 
-    public async Task<CategoryEntity> CreateCategoryAsync(CreateCategoryDto dto, CancellationToken cancellationToken = default)
+    public async Task<CategoryEntity> CreateCategoryAsync(CreateCategoryDto dto,
+        CancellationToken cancellationToken = default)
     {
         var category = new CategoryEntity
         {
@@ -157,7 +160,8 @@ public sealed class AdminService(
         return category;
     }
 
-    public async Task<CategoryEntity?> UpdateCategoryAsync(Guid id, UpdateCategoryDto dto, CancellationToken cancellationToken = default)
+    public async Task<CategoryEntity?> UpdateCategoryAsync(Guid id, UpdateCategoryDto dto,
+        CancellationToken cancellationToken = default)
     {
         var category = await categoryRepository.GetByIdAsync(id, cancellationToken: cancellationToken);
         if (category == null) return null;
@@ -172,7 +176,7 @@ public sealed class AdminService(
     {
         var category = await categoryRepository.GetByIdAsync(id, cancellationToken: cancellationToken);
         if (category == null) return false;
-        
+
         var hasProducts = await productRepository.GetQueryable(filter: p => p.CategoryId == id)
             .AnyAsync(cancellationToken);
 
@@ -184,7 +188,7 @@ public sealed class AdminService(
         await categoryRepository.HardDeleteAsync(category, cancellationToken);
         return true;
     }
-    
+
     public async Task<PagedList<TagEntity>> GetPagedTagsAsync(
         int pageNumber,
         int pageSize,
@@ -211,7 +215,8 @@ public sealed class AdminService(
         return tag;
     }
 
-    public async Task<TagEntity?> UpdateTagAsync(Guid id, UpdateTagDto dto, CancellationToken cancellationToken = default)
+    public async Task<TagEntity?> UpdateTagAsync(Guid id, UpdateTagDto dto,
+        CancellationToken cancellationToken = default)
     {
         var tag = await tagRepository.GetByIdAsync(id, cancellationToken: cancellationToken);
         if (tag == null) return null;
@@ -230,7 +235,7 @@ public sealed class AdminService(
         await tagRepository.HardDeleteAsync(tag, cancellationToken);
         return true;
     }
-    
+
     public async Task<PagedList<ProductEntity>> GetPagedProductsForAdminAsync(
         int pageNumber,
         int pageSize,
@@ -256,12 +261,19 @@ public sealed class AdminService(
         return await PagedList<ProductEntity>.ToPagedListAsync(query, pageNumber, pageSize, cancellationToken);
     }
 
-    public async Task<ProductEntity> CreateProductAsync(CreateProductDto dto, CancellationToken cancellationToken = default)
+    public async Task<ProductEntity> CreateProductAsync(
+        CreateProductDto dto,
+        CancellationToken cancellationToken = default)
     {
         var product = new ProductEntity
         {
             Name = dto.Name.Trim(),
-            Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim(),
+            Description = string.IsNullOrWhiteSpace(dto.Description)
+                ? null 
+                : dto.Description.Trim(),
+            CompositionAndCare = string.IsNullOrWhiteSpace(dto.CompositionAndCare)
+                ? null 
+                : dto.CompositionAndCare.Trim(),
             Price = dto.Price,
             DiscountPrice = dto.DiscountPrice,
             CategoryId = dto.CategoryId,
@@ -284,7 +296,10 @@ public sealed class AdminService(
         return product;
     }
 
-    public async Task<ProductEntity?> UpdateProductAsync(Guid id, UpdateProductDto dto, CancellationToken cancellationToken = default)
+    public async Task<ProductEntity?> UpdateProductAsync(
+        Guid id,
+        UpdateProductDto dto,
+        CancellationToken cancellationToken = default)
     {
         var product = await productRepository.GetByIdAsync(
             id,
@@ -297,7 +312,12 @@ public sealed class AdminService(
         if (product == null) return null;
 
         product.Name = dto.Name.Trim();
-        product.Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim();
+        product.Description = string.IsNullOrWhiteSpace(dto.Description) 
+            ? null 
+            : dto.Description.Trim();
+        product.CompositionAndCare = string.IsNullOrWhiteSpace(dto.CompositionAndCare) 
+            ? null 
+            : dto.CompositionAndCare.Trim();
         product.Price = dto.Price;
         product.DiscountPrice = dto.DiscountPrice;
         product.CategoryId = dto.CategoryId;
@@ -325,7 +345,10 @@ public sealed class AdminService(
         return product;
     }
 
-    public async Task<bool> DeleteProductAsync(Guid id, bool hardDelete = false, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteProductAsync(
+        Guid id,
+        bool hardDelete = false,
+        CancellationToken cancellationToken = default)
     {
         var product = await productRepository.GetByIdAsync(id, cancellationToken: cancellationToken);
         if (product == null) return false;
@@ -351,8 +374,9 @@ public sealed class AdminService(
         await productRepository.UpdateAsync(product, cancellationToken);
         return true;
     }
-    
-    public async Task<IEnumerable<OrderStatusEntity>> GetAllOrderStatusesAsync(CancellationToken cancellationToken = default)
+
+    public async Task<IEnumerable<OrderStatusEntity>> GetAllOrderStatusesAsync(
+        CancellationToken cancellationToken = default)
     {
         return await orderStatusRepository.GetQueryable().ToListAsync(cancellationToken);
     }

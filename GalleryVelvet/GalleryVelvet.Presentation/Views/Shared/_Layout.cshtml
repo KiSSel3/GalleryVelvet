@@ -26,6 +26,7 @@
             --hover-background-color: #E9ECEF;
             --sales-color: #FF0000;
             --logout-color: #dc3545;
+            --admin-color: #28a745;
         }
 
         body {
@@ -296,7 +297,6 @@
         }
         .header-nav-links a:hover { color: var(--accent-color); }
 
-
         .header-logo {
             font-size: 1.8em; font-weight: 700;
             color: var(--accent-color);
@@ -307,19 +307,27 @@
         .header-right-icons {
             display: flex;
             align-items: center;
+            gap: 15px;
         }
 
         .header-right-icons a {
             color: var(--text-color-primary);
-            margin-left: 20px;
             font-size: 1.2em;
             text-decoration: none;
             transition: color 0.3s ease;
             position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
         }
 
         .header-right-icons a:hover {
             color: var(--accent-color);
+            background-color: var(--hover-background-color);
         }
 
         .header-right-icons a.logout-btn {
@@ -329,12 +337,26 @@
 
         .header-right-icons a.logout-btn:hover {
             color: #c82333;
+            background-color: rgba(220, 53, 69, 0.1);
         }
 
-        .header-right-icons a[title]:hover::after {
+        .header-right-icons a.admin-btn {
+            color: var(--admin-color);
+            font-size: 1.1em;
+            position: relative;
+        }
+
+        .header-right-icons a.admin-btn:hover {
+            color: #1e7e34;
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+
+
+
+        .header-right-icons a[title]:hover::before {
             content: attr(title);
             position: absolute;
-            bottom: -30px;
+            bottom: -35px;
             left: 50%;
             transform: translateX(-50%);
             background: #000;
@@ -342,8 +364,9 @@
             padding: 4px 8px;
             font-size: 10px;
             white-space: nowrap;
-            border-radius: 2px;
+            border-radius: 4px;
             z-index: 1000;
+            pointer-events: none;
         }
 
         .top-megamenu-panel {
@@ -376,7 +399,6 @@
             visibility: visible;
         }
 
-
         .megamenu-content-wrapper {
             display: flex;
             justify-content: flex-start;
@@ -393,7 +415,6 @@
         .megamenu-column:last-of-type {
             padding-right: 0;
         }
-
 
         .megamenu-column ul {
             list-style: none;
@@ -488,18 +509,21 @@
         .language-currency-selector span, .language-currency-selector select { margin-bottom: 10px; margin-right: 0; }
         .language-currency-selector span:last-child, .language-currency-selector select:last-child { margin-bottom: 0; }
 
-        .header-right-icons a[title]:hover::after {
+        .header-right-icons a[title]:hover::before {
             display: none;
         }
 
         .header-right-icons {
-            gap: 15px;
+            gap: 10px;
         }
 
         .header-right-icons a {
-            margin-left: 15px;
+            width: 35px;
+            height: 35px;
             font-size: 1.1em;
         }
+
+
         }
 
     </style>
@@ -582,18 +606,26 @@
         <div class="header-right-icons">
             @if (User.Identity?.IsAuthenticated == true)
             {
-            <a asp-controller="User" asp-action="Index" aria-label="Profile" title="Личный кабинет">
-                <i class="fas fa-user"></i>
-            </a>
-            <a asp-controller="Account" asp-action="Logout" class="logout-btn" aria-label="Logout" title="Выйти из аккаунта">
-                <i class="fas fa-sign-out-alt"></i>
-            </a>
+                <a asp-controller="User" asp-action="Index" aria-label="Profile" title="Личный кабинет">
+                    <i class="fas fa-user"></i>
+                </a>
+                
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-controller="Admin" asp-action="Index" class="admin-btn" aria-label="Admin Panel" title="Панель администратора">
+                        <i class="fas fa-cogs"></i>
+                    </a>
+                }
+                
+                <a asp-controller="Account" asp-action="Logout" class="logout-btn" aria-label="Logout" title="Выйти из аккаунта">
+                    <i class="fas fa-sign-out-alt"></i>
+                </a>
             }
             else
             {
-            <a asp-controller="Account" asp-action="Login" aria-label="Login" title="Войти">
-                <i class="fas fa-user"></i>
-            </a>
+                <a asp-controller="Account" asp-action="Login" aria-label="Login" title="Войти">
+                    <i class="fas fa-user"></i>
+                </a>
             }
             <a asp-controller="Cart"
                asp-action="GetCartByUserId"
@@ -668,6 +700,17 @@
                     womanMegaMenu.classList.remove('megamenu-visible');
                     womanMenuToggle.classList.remove('active-megamenu');
                 }
+            });
+        }
+        
+        const adminBtn = document.querySelector('.admin-btn');
+        if (adminBtn) {
+            adminBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.1)';
+            });
+            
+            adminBtn.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
             });
         }
     });

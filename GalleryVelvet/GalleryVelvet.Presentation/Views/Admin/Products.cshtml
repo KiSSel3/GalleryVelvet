@@ -48,28 +48,34 @@
 
     .header-actions {
         display: flex;
-        gap: 15px;
+        gap: 10px;
     }
 
-    .create-btn {
-        padding: 12px 25px;
-        background: linear-gradient(135deg, #e74c3c, #c0392b);
-        color: white;
-        text-decoration: none;
+    .btn {
+        padding: 12px 20px;
+        border: none;
         border-radius: 8px;
         font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
         display: inline-flex;
         align-items: center;
         gap: 8px;
         transition: all 0.3s ease;
+        font-size: 14px;
     }
 
-    .create-btn:hover {
-        background: linear-gradient(135deg, #c0392b, #e74c3c);
+    .btn-success {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #2ecc71, #27ae60);
         color: white;
         text-decoration: none;
         transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
     }
 
     .admin-filters {
@@ -82,7 +88,7 @@
 
     .filters-row {
         display: grid;
-        grid-template-columns: 2fr 1fr 1fr auto;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         gap: 20px;
         align-items: end;
     }
@@ -109,27 +115,8 @@
 
     .filter-input:focus {
         outline: none;
-        border-color: #e74c3c;
-        box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
-    }
-
-    .filter-checkbox {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 12px 0;
-    }
-
-    .filter-checkbox input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-    }
-
-    .filter-checkbox label {
-        cursor: pointer;
-        font-weight: 500;
-        color: #2c3e50;
+        border-color: #3498db;
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
     }
 
     .filter-btn {
@@ -152,62 +139,152 @@
         box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
     }
 
-    .products-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-        gap: 25px;
-    }
-
-    .product-card {
+    .products-table {
         background: white;
         border-radius: 10px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         overflow: hidden;
-        transition: all 0.3s ease;
-        border: 2px solid transparent;
-        position: relative;
     }
 
-    .product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        border-color: #e74c3c;
+    .table-header {
+        background: linear-gradient(135deg, #34495e, #2c3e50);
+        color: white;
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    .product-card.deleted {
-        opacity: 0.6;
-        border-color: #95a5a6;
+    .table-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin: 0;
     }
 
-    .product-card.deleted:hover {
-        border-color: #7f8c8d;
+    .table-count {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .products-grid {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .products-grid th,
+    .products-grid td {
+        padding: 15px 20px;
+        text-align: left;
+        border-bottom: 1px solid #e9ecef;
+        vertical-align: top;
+    }
+
+    .products-grid th {
+        background: #f8f9fa;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .products-grid tr:hover {
+        background: #f8f9fa;
+    }
+
+    .product-info {
+        display: flex;
+        gap: 15px;
+        align-items: center;
     }
 
     .product-image {
-        width: 100%;
-        height: 200px;
+        width: 60px;
+        height: 60px;
         object-fit: cover;
-        position: relative;
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        flex-shrink: 0;
     }
 
-    .product-image-placeholder {
-        width: 100%;
-        height: 200px;
-        background: linear-gradient(135deg, #ecf0f1, #bdc3c7);
+    .product-details h5 {
+        margin: 0 0 5px 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .product-details p {
+        margin: 0;
+        font-size: 12px;
+        color: #6c757d;
+        line-height: 1.4;
+    }
+
+    .product-category {
+        background: #e3f2fd;
+        color: #1976d2;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .product-price {
+        font-weight: 600;
+        color: #27ae60;
+        font-size: 16px;
+    }
+
+    .product-price-old {
+        text-decoration: line-through;
+        color: #6c757d;
+        font-size: 14px;
+        margin-right: 8px;
+    }
+
+    .product-tags {
         display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 48px;
-        color: #7f8c8d;
+        flex-wrap: wrap;
+        gap: 4px;
+        max-width: 150px;
     }
 
-    .product-status {
-        position: absolute;
-        top: 10px;
-        right: 10px;
+    .tag-badge {
+        background: #f8f9fa;
+        color: #6c757d;
+        padding: 2px 6px;
+        border-radius: 8px;
+        font-size: 10px;
+        border: 1px solid #e9ecef;
+    }
+
+    .product-sizes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        max-width: 120px;
+    }
+
+    .size-badge {
+        background: #e8f5e8;
+        color: #2e7d32;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 600;
+        border: 1px solid #c8e6c9;
+    }
+
+    .status-badge {
         padding: 6px 12px;
-        border-radius: 15px;
-        font-size: 11px;
+        border-radius: 20px;
+        font-size: 12px;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -225,92 +302,16 @@
         border: 1px solid #f5c6cb;
     }
 
-    .status-discount {
-        background: #fff3cd;
-        color: #856404;
-        border: 1px solid #ffeaa7;
-    }
-
-    .product-body {
-        padding: 20px;
-    }
-
-    .product-name {
-        font-size: 18px;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 10px;
-        line-height: 1.3;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .product-category {
-        font-size: 12px;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        margin-bottom: 10px;
-        font-weight: 500;
-    }
-
-    .product-price {
+    .action-buttons {
         display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 15px;
-    }
-
-    .price-current {
-        font-size: 20px;
-        font-weight: 700;
-        color: #e74c3c;
-    }
-
-    .price-original {
-        font-size: 16px;
-        color: #6c757d;
-        text-decoration: line-through;
-    }
-
-    .discount-badge {
-        background: #e74c3c;
-        color: white;
-        padding: 2px 6px;
-        border-radius: 10px;
-        font-size: 11px;
-        font-weight: 600;
-    }
-
-    .product-tags {
-        display: flex;
-        flex-wrap: wrap;
         gap: 6px;
-        margin-bottom: 15px;
-        min-height: 25px;
-    }
-
-    .tag-badge {
-        background: #e9ecef;
-        color: #495057;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 500;
-    }
-
-    .product-actions {
-        display: flex;
-        gap: 8px;
+        flex-wrap: wrap;
     }
 
     .action-btn {
-        flex: 1;
-        padding: 8px 12px;
+        padding: 6px 10px;
         border: none;
-        border-radius: 6px;
+        border-radius: 4px;
         font-size: 11px;
         font-weight: 600;
         cursor: pointer;
@@ -318,19 +319,16 @@
         transition: all 0.3s ease;
         display: inline-flex;
         align-items: center;
-        justify-content: center;
         gap: 4px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
     }
 
     .action-btn-edit {
-        background: #f39c12;
+        background: #3498db;
         color: white;
     }
 
     .action-btn-edit:hover {
-        background: #e67e22;
+        background: #2980b9;
         color: white;
         text-decoration: none;
         transform: translateY(-1px);
@@ -356,70 +354,82 @@
         transform: translateY(-1px);
     }
 
-    .empty-state {
-        text-align: center;
-        padding: 80px 30px;
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        grid-column: 1 / -1;
+    .action-btn-hard-delete {
+        background: #8e44ad;
+        color: white;
     }
 
-    .empty-state-icon {
-        font-size: 64px;
-        margin-bottom: 25px;
-        opacity: 0.5;
-    }
-
-    .empty-state-text {
-        font-size: 24px;
-        margin-bottom: 15px;
-        color: #2c3e50;
-        font-weight: 600;
-    }
-
-    .empty-state-subtext {
-        font-size: 16px;
-        opacity: 0.7;
-        color: #6c757d;
-        margin-bottom: 30px;
+    .action-btn-hard-delete:hover {
+        background: #7d3c98;
+        transform: translateY(-1px);
     }
 
     .pagination {
-        margin-top: 40px;
+        padding: 20px 30px;
         display: flex;
-        justify-content: center;
-        gap: 10px;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .pagination-info {
+        color: #6c757d;
+        font-size: 14px;
+    }
+
+    .pagination-links {
+        display: flex;
+        gap: 8px;
     }
 
     .pagination-link {
-        padding: 10px 15px;
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        color: #e74c3c;
+        padding: 8px 12px;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        color: #3498db;
         text-decoration: none;
-        font-weight: 600;
         transition: all 0.3s ease;
     }
 
     .pagination-link:hover {
-        background: #e74c3c;
+        background: #3498db;
         color: white;
         text-decoration: none;
-        border-color: #e74c3c;
     }
 
     .pagination-link.active {
-        background: #e74c3c;
+        background: #3498db;
         color: white;
-        border-color: #e74c3c;
+        border-color: #3498db;
     }
 
     .pagination-link.disabled {
         color: #6c757d;
         background: #f8f9fa;
         cursor: not-allowed;
-        border-color: #e9ecef;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 30px;
+        color: #6c757d;
+    }
+
+    .empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+    .empty-state-text {
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+
+    .empty-state-subtext {
+        font-size: 14px;
+        opacity: 0.7;
     }
 
     .alert {
@@ -441,90 +451,50 @@
         color: #721c24;
     }
 
-    .stats-bar {
-        display: flex;
-        gap: 20px;
-        background: white;
-        padding: 20px 30px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        margin-bottom: 30px;
-    }
-
-    .stat-item {
-        text-align: center;
-        flex: 1;
-    }
-
-    .stat-number {
-        font-size: 24px;
-        font-weight: 700;
-        color: #2c3e50;
-        display: block;
-        margin-bottom: 5px;
-    }
-
-    .stat-label {
-        font-size: 12px;
-        color: #6c757d;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
     @@media (max-width: 768px) {
-        .admin-page {
-            padding: 20px 15px;
-        }
-
-        .admin-header {
-            flex-direction: column;
-            gap: 15px;
-            text-align: center;
-        }
-
-        .header-actions {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .filters-row {
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .stats-bar {
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .products-grid {
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        .product-actions {
-            flex-direction: column;
-        }
+    .admin-page {
+        padding: 20px 15px;
     }
 
-    .fade-in {
-        animation: fadeInUp 0.6s ease-out;
+    .admin-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
     }
 
-    @@keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+    .filters-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .table-wrapper {
+        border-radius: 0;
+    }
+
+    .products-grid th,
+    .products-grid td {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+
+    .product-info {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .pagination {
+        flex-direction: column;
+        gap: 15px;
+    }
     }
 </style>
 
 <main class="admin-page">
-    <div class="admin-header fade-in">
+    <div class="admin-header">
         <div>
             <h1 class="admin-title">Управление товарами</h1>
             <div class="admin-breadcrumb">
@@ -532,51 +502,32 @@
             </div>
         </div>
         <div class="header-actions">
-            <a href="@Url.Action("CreateProduct", "Admin")" class="create-btn">
-                🛍️ Добавить товар
+            <a href="@Url.Action("CreateProduct", "Admin")" class="btn btn-success">
+                ➕ Создать товар
             </a>
         </div>
     </div>
 
     @if (TempData["Success"] != null)
     {
-        <div class="alert alert-success fade-in">
+        <div class="alert alert-success" role="alert">
             @TempData["Success"]
         </div>
     }
 
     @if (TempData["Error"] != null)
     {
-        <div class="alert alert-danger fade-in">
+        <div class="alert alert-danger" role="alert">
             @TempData["Error"]
         </div>
     }
 
-    <div class="stats-bar fade-in">
-        <div class="stat-item">
-            <span class="stat-number">@Model.Products.Where(p => !p.IsDeleted).Count()</span>
-            <span class="stat-label">Активные</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">@Model.Products.Where(p => p.IsDeleted).Count()</span>
-            <span class="stat-label">Удаленные</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">@Model.Products.Where(p => p.DiscountPrice.HasValue && p.DiscountPrice < p.Price).Count()</span>
-            <span class="stat-label">Со скидкой</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number">@Model.Products.MetaData.TotalCount</span>
-            <span class="stat-label">Всего</span>
-        </div>
-    </div>
-
-    <form method="get" class="admin-filters fade-in">
+    <form method="get" class="admin-filters">
         <div class="filters-row">
             <div class="filter-group">
-                <label class="filter-label">Поиск товаров</label>
-                <input type="text" name="searchTerm" value="@Model.SearchTerm" 
-                       class="filter-input" placeholder="Введите название товара...">
+                <label class="filter-label">Поиск</label>
+                <input type="text" name="searchTerm" value="@Model.SearchTerm"
+                       class="filter-input" placeholder="Поиск по названию товара...">
             </div>
 
             <div class="filter-group">
@@ -593,12 +544,11 @@
             </div>
 
             <div class="filter-group">
-                <label class="filter-label">Опции</label>
-                <div class="filter-checkbox">
-                    <input type="checkbox" name="includeDeleted" value="true" 
-                           id="includeDeleted" checked="@Model.IncludeDeleted">
-                    <label for="includeDeleted">Показать удаленные</label>
-                </div>
+                <label class="filter-label">Показать удаленные</label>
+                <select name="includeDeleted" class="filter-input">
+                    <option value="false" selected="@(!Model.IncludeDeleted)">Только активные</option>
+                    <option value="true" selected="@Model.IncludeDeleted">Включая удаленные</option>
+                </select>
             </div>
 
             <div class="filter-group">
@@ -609,238 +559,234 @@
         </div>
     </form>
 
-    <div class="products-grid">
+    <div class="products-table">
+        <div class="table-header">
+            <h3 class="table-title">Список товаров</h3>
+            <div class="table-count">
+                Найдено: @Model.Products.MetaData.TotalCount товаров
+            </div>
+        </div>
+
         @if (Model.Products.Any())
         {
-            @foreach (var product in Model.Products)
-            {
-                <div class="product-card @(product.IsDeleted ? "deleted" : "") fade-in" 
-                     style="animation-delay: @(Model.Products.ToList().IndexOf(product) * 0.05)s;">
-                    
-                    @{
-                        var hasDiscount = product.DiscountPrice.HasValue && product.DiscountPrice < product.Price;
-                        var mainImage = product.Images.FirstOrDefault();
-                    }
-
-                    <!-- Статус товара -->
-                    <div class="product-status @(product.IsDeleted ? "status-deleted" : hasDiscount ? "status-discount" : "status-active")">
-                        @if (product.IsDeleted)
-                        {
-                            <text>Удален</text>
-                        }
-                        else if (hasDiscount)
-                        {
-                            <text>Скидка</text>
-                        }
-                        else
-                        {
-                            <text>Активен</text>
-                        }
-                    </div>
-
-                    <!-- Изображение товара -->
-                    @if (mainImage != null && !string.IsNullOrWhiteSpace(mainImage.Image))
+            <div class="table-wrapper">
+                <table class="products-grid">
+                    <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Категория</th>
+                        <th>Цена</th>
+                        <th>Теги</th>
+                        <th>Размеры</th>
+                        <th>Статус</th>
+                        <th>Действия</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var product in Model.Products)
                     {
-                        <img src="data:image/@(mainImage.Format ?? "jpeg");base64,@mainImage.Image" 
-                             alt="@product.Name" class="product-image" />
+                        var firstImage = product.Images.FirstOrDefault();
+                        var imageSrc = firstImage != null
+                            ? $"data:image/{firstImage.Format};base64,{firstImage.Image}"
+                            : "/images/no-image_0.jpg";
+
+                        <tr>
+                            <td>
+                                <div class="product-info">
+                                    <img src="@imageSrc" alt="@product.Name" class="product-image" />
+                                    <div class="product-details">
+                                        <h5>@product.Name</h5>
+                                        @if (!string.IsNullOrWhiteSpace(product.Description))
+                                        {
+                                            <p>@(product.Description.Length > 80 ? product.Description.Substring(0, 80) + "..." : product.Description)</p>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="product-category">@product.Category.Name</span>
+                            </td>
+                            <td>
+                                <div class="product-price">
+                                    @if (product.DiscountPrice.HasValue)
+                                    {
+                                        <span class="product-price-old">@product.Price.ToString("N0") BYN</span>
+                                        <span>@product.DiscountPrice.Value.ToString("N0") BYN</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@product.Price.ToString("N0") BYN</span>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <div class="product-tags">
+                                    @foreach (var productTag in product.ProductTags.Take(3))
+                                    {
+                                        <span class="tag-badge">@productTag.Tag.Name</span>
+                                    }
+                                    @if (product.ProductTags.Count > 3)
+                                    {
+                                        <span class="tag-badge">+@(product.ProductTags.Count - 3)</span>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <div class="product-sizes">
+                                    @foreach (var productSize in product.ProductSizes.Take(4))
+                                    {
+                                        <span class="size-badge">@productSize.Size.Label</span>
+                                    }
+                                    @if (product.ProductSizes.Count > 4)
+                                    {
+                                        <span class="size-badge">+@(product.ProductSizes.Count - 4)</span>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                @if (product.IsDeleted)
+                                {
+                                    <span class="status-badge status-deleted">Удален</span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-active">Активен</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    @if (!product.IsDeleted)
+                                    {
+                                        <a href="@Url.Action("EditProduct", "Admin", new { id = product.Id })"
+                                           class="action-btn action-btn-edit">
+                                            ✏️ Редактировать
+                                        </a>
+
+                                        <form asp-action="DeleteProduct" asp-route-id="@product.Id" method="post" style="display: inline;">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="hardDelete" value="false" />
+                                            <button type="submit" class="action-btn action-btn-delete"
+                                                    onclick="return confirm('Вы уверены, что хотите удалить этот товар?')">
+                                                🗑️ Удалить
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <form asp-action="RestoreProduct" asp-route-id="@product.Id" method="post" style="display: inline;">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="action-btn action-btn-restore">
+                                                ↩️ Восстановить
+                                            </button>
+                                        </form>
+
+                                        <form asp-action="DeleteProduct" asp-route-id="@product.Id" method="post" style="display: inline;">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="hardDelete" value="true" />
+                                            <button type="submit" class="action-btn action-btn-hard-delete"
+                                                    onclick="return confirm('ВНИМАНИЕ! Это действие нельзя отменить. Удалить товар навсегда?')">
+                                                💀 Удалить навсегда
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <div class="pagination-info">
+                    Показано @((Model.Products.MetaData.CurrentPage - 1) * Model.Products.MetaData.PageSize + 1) -
+                    @Math.Min(Model.Products.MetaData.CurrentPage * Model.Products.MetaData.PageSize, Model.Products.MetaData.TotalCount)
+                    из @Model.Products.MetaData.TotalCount товаров
+                </div>
+
+                <div class="pagination-links">
+                    @if (Model.Products.MetaData.HasPrevious)
+                    {
+                        <a href="@Url.Action("Products", "Admin", new {
+                                     pageNumber = Model.Products.MetaData.CurrentPage - 1,
+                                     searchTerm = Model.SearchTerm,
+                                     categoryId = Model.SelectedCategoryId,
+                                     includeDeleted = Model.IncludeDeleted
+                                 })" class="pagination-link">« Назад</a>
                     }
                     else
                     {
-                        <div class="product-image-placeholder">
-                            🛍️
-                        </div>
+                        <span class="pagination-link disabled">« Назад</span>
                     }
 
-                    <div class="product-body">
-                        <!-- Категория -->
-                        <div class="product-category">@product.Category.Name</div>
+                    @for (int i = Math.Max(1, Model.Products.MetaData.CurrentPage - 2);
+                          i <= Math.Min(Model.Products.MetaData.TotalPages, Model.Products.MetaData.CurrentPage + 2);
+                          i++)
+                    {
+                        if (i == Model.Products.MetaData.CurrentPage)
+                        {
+                            <span class="pagination-link active">@i</span>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Products", "Admin", new {
+                                         pageNumber = i,
+                                         searchTerm = Model.SearchTerm,
+                                         categoryId = Model.SelectedCategoryId,
+                                         includeDeleted = Model.IncludeDeleted
+                                     })" class="pagination-link">@i</a>
+                        }
+                    }
 
-                        <!-- Название -->
-                        <h3 class="product-name">@product.Name</h3>
-
-                        <!-- Цена -->
-                        <div class="product-price">
-                            @if (hasDiscount)
-                            {
-                                <span class="price-current">@product.DiscountPrice?.ToString("N0") BYN</span>
-                                <span class="price-original">@product.Price.ToString("N0") BYN</span>
-                                <span class="discount-badge">
-                                    -@(Math.Round((1 - (product.DiscountPrice!.Value / product.Price)) * 100))%
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="price-current">@product.Price.ToString("N0") BYN</span>
-                            }
-                        </div>
-
-                        <!-- Теги -->
-                        <div class="product-tags">
-                            @foreach (var productTag in product.ProductTags.Take(3))
-                            {
-                                <span class="tag-badge">#@productTag.Tag.Name</span>
-                            }
-                            @if (product.ProductTags.Count > 3)
-                            {
-                                <span class="tag-badge">+@(product.ProductTags.Count - 3)</span>
-                            }
-                        </div>
-
-                        <!-- Действия -->
-                        <div class="product-actions">
-                            <a href="@Url.Action("EditProduct", "Admin", new { id = product.Id })" 
-                               class="action-btn action-btn-edit">
-                                ✏️ Редактировать
-                            </a>
-
-                            @if (product.IsDeleted)
-                            {
-                                <form asp-action="RestoreProduct" asp-route-id="@product.Id" method="post" 
-                                      style="flex: 1;" onsubmit="return confirmRestore('@product.Name')">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="action-btn action-btn-restore" style="width: 100%;">
-                                        🔄 Восстановить
-                                    </button>
-                                </form>
-                            }
-                            else
-                            {
-                                <form asp-action="DeleteProduct" asp-route-id="@product.Id" method="post" 
-                                      style="flex: 1;" onsubmit="return confirmDelete('@product.Name')">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="action-btn action-btn-delete" style="width: 100%;">
-                                        🗑️ Удалить
-                                    </button>
-                                </form>
-                            }
-                        </div>
-                    </div>
+                    @if (Model.Products.MetaData.HasNext)
+                    {
+                        <a href="@Url.Action("Products", "Admin", new {
+                                     pageNumber = Model.Products.MetaData.CurrentPage + 1,
+                                     searchTerm = Model.SearchTerm,
+                                     categoryId = Model.SelectedCategoryId,
+                                     includeDeleted = Model.IncludeDeleted
+                                 })" class="pagination-link">Вперед »</a>
+                    }
+                    else
+                    {
+                        <span class="pagination-link disabled">Вперед »</span>
+                    }
                 </div>
-            }
+            </div>
         }
         else
         {
             <div class="empty-state">
-                <div class="empty-state-icon">🛍️</div>
+                <div class="empty-state-icon">📦</div>
                 <div class="empty-state-text">Товары не найдены</div>
-                <div class="empty-state-subtext">
-                    @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
-                    {
-                        <text>По запросу "@Model.SearchTerm" ничего не найдено. Попробуйте изменить параметры поиска.</text>
-                    }
-                    else
-                    {
-                        <text>В системе пока нет товаров. Добавьте первый товар в каталог.</text>
-                    }
-                </div>
-                
-                @if (string.IsNullOrWhiteSpace(Model.SearchTerm))
-                {
-                    <a href="@Url.Action("CreateProduct", "Admin")" class="create-btn">
-                        🛍️ Добавить первый товар
-                    </a>
-                }
+                <div class="empty-state-subtext">Попробуйте изменить параметры фильтрации или создайте новый товар</div>
             </div>
         }
     </div>
-
-    @if (Model.Products.MetaData.TotalPages > 1)
-    {
-        <div class="pagination">
-            @if (Model.Products.MetaData.HasPrevious)
-            {
-                <a href="@Url.Action("Products", "Admin", new { 
-                    pageNumber = Model.Products.MetaData.CurrentPage - 1,
-                    searchTerm = Model.SearchTerm,
-                    categoryId = Model.SelectedCategoryId,
-                    includeDeleted = Model.IncludeDeleted
-                })" class="pagination-link">← Назад</a>
-            }
-            else
-            {
-                <span class="pagination-link disabled">← Назад</span>
-            }
-
-            @for (int i = Math.Max(1, Model.Products.MetaData.CurrentPage - 2); 
-                  i <= Math.Min(Model.Products.MetaData.TotalPages, Model.Products.MetaData.CurrentPage + 2); 
-                  i++)
-            {
-                if (i == Model.Products.MetaData.CurrentPage)
-                {
-                    <span class="pagination-link active">@i</span>
-                }
-                else
-                {
-                    <a href="@Url.Action("Products", "Admin", new { 
-                        pageNumber = i,
-                        searchTerm = Model.SearchTerm,
-                        categoryId = Model.SelectedCategoryId,
-                        includeDeleted = Model.IncludeDeleted
-                    })" class="pagination-link">@i</a>
-                }
-            }
-
-            @if (Model.Products.MetaData.HasNext)
-            {
-                <a href="@Url.Action("Products", "Admin", new { 
-                    pageNumber = Model.Products.MetaData.CurrentPage + 1,
-                    searchTerm = Model.SearchTerm,
-                    categoryId = Model.SelectedCategoryId,
-                    includeDeleted = Model.IncludeDeleted
-                })" class="pagination-link">Вперед →</a>
-            }
-            else
-            {
-                <span class="pagination-link disabled">Вперед →</span>
-            }
-        </div>
-    }
 </main>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const filters = document.querySelectorAll('.filter-input, input[type="checkbox"]');
+        const filters = document.querySelectorAll('.filter-input');
         filters.forEach(filter => {
-            if (filter.type === 'checkbox' || filter.tagName === 'SELECT') {
+            if (filter.tagName === 'SELECT') {
                 filter.addEventListener('change', function() {
                     this.form.submit();
                 });
             }
         });
-        
-        const searchInput = document.querySelector('input[name="searchTerm"]');
-        let searchTimeout;
-        
-        if (searchInput) {
-            searchInput.addEventListener('input', function() {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    this.form.submit();
-                }, 500);
-            });
-        }
-        
-        const productCards = document.querySelectorAll('.product-card:not(.deleted)');
-        productCards.forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                if (!this.classList.contains('deleted')) {
-                    this.style.transform = 'translateY(-8px) scale(1.02)';
-                }
+
+        const tableRows = document.querySelectorAll('.products-grid tbody tr');
+        tableRows.forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                this.style.backgroundColor = '#e3f2fd';
             });
 
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0) scale(1)';
+            row.addEventListener('mouseleave', function() {
+                this.style.backgroundColor = '';
             });
         });
 
         console.log('Страница управления товарами загружена');
     });
-
-    function confirmDelete(productName) {
-        return confirm(`Вы уверены, что хотите удалить товар "${productName}"?\n\nТовар будет скрыт из каталога, но не удален полностью.`);
-    }
-
-    function confirmRestore(productName) {
-        return confirm(`Восстановить товар "${productName}" в каталоге?`);
-    }
 </script>

@@ -1,8 +1,9 @@
 using System.ComponentModel.DataAnnotations;
+using GalleryVelvet.Domain.Entities;
 
 namespace GalleryVelvet.Presentation.Models.Admin;
 
-public sealed class CreateProductRequestViewModel
+public sealed class EditProductRequestViewModel
 {
     [Required(ErrorMessage = "Название продукта обязательно")]
     [StringLength(200, ErrorMessage = "Название не может быть длиннее 200 символов")]
@@ -28,4 +29,7 @@ public sealed class CreateProductRequestViewModel
     public List<Guid>? SizeIds { get; set; }
     
     public IFormFile[]? Images { get; set; }
+    
+    public List<ExistingImageViewModel>? ExistingImages { get; set; }
+    public List<Guid>? ImagesToDelete { get; set; }
 }
